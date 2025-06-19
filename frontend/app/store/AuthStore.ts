@@ -27,7 +27,7 @@ const AuthStore = create<AuthState>()(
             register: async (formdata: any)=>{
                 
                 try {
-                    await axios.post('http://localhost:8000/register', formdata);
+                    await axios.post('/register', formdata);
                     return { success: true}
                 } catch (error) {
                    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
@@ -48,7 +48,7 @@ const AuthStore = create<AuthState>()(
                     const formData = new FormData()
                     formData.append('username', formdata.email);
                     formData.append('password', formdata.password);
-                    const response = await axios.post('http://localhost:8000/token',formData,{
+                    const response = await axios.post('/token',formData,{
                                             headers: {
                                               'Content-Type': 'application/x-www-form-urlencoded', 
                                             },

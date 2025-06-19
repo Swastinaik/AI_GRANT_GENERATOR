@@ -13,7 +13,7 @@ const Download = (downloadResponse: DownloadProps) => {
             const formData = new FormData();
             formData.append("grant_proposal", JSON.stringify(downloadResponse))
             
-            const response = await axios.post("http://127.0.0.1:8000/generate-pdf", formData,{responseType: 'blob'});
+            const response = await axios.post("/generate-pdf", formData,{responseType: 'blob'});
             const file = new Blob([response.data], { type: 'application/pdf' });
             if (!file) {
                 throw new Error("File not found");
