@@ -34,7 +34,7 @@ const formSchema = z.object({
   }),
 })
 
-export function ProfileForm() {
+ function ProfileForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
