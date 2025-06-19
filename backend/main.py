@@ -24,7 +24,9 @@ load_dotenv()
 
 
 app = FastAPI()
-
+vercel_frontend_url = os.getenv("VERCEL_FRONTEND_URL")
+vercel_current_url = os.getenv("VERCEL_URL")
+vercel_env = os.getenv("VERCEL_ENV")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 async def get_user(email: str):
@@ -38,6 +40,9 @@ origins = [
     "http://localhost:8000",
     "http://localhost:3001",
 ]
+if vercel_frontend_url:
+    origins.append(vercel_frontend_url)
+trusted_origins = [o for o in origins if o is not None]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
