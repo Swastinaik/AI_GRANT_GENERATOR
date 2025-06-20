@@ -9,5 +9,5 @@ motor
 fastapi
 uvicorn
 passlib
-jose
+python-jose
 pypdf
