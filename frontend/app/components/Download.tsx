@@ -12,8 +12,8 @@ const Download = (downloadResponse: DownloadProps) => {
             console.log("DOwnload response ----------", downloadResponse)
             const formData = new FormData();
             formData.append("grant_proposal", JSON.stringify(downloadResponse))
-            
-            const response = await axios.post("/generate-pdf", formData,{responseType: 'blob'});
+            const url = process.env.NEXT_PUBLIC_BACKEND_URL || ''
+            const response = await axios.post(`${url}/generate-pdf`, formData,{responseType: 'blob'});
             const file = new Blob([response.data], { type: 'application/pdf' });
             if (!file) {
                 throw new Error("File not found");

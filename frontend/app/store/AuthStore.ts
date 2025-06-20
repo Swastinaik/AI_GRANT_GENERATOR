@@ -27,7 +27,8 @@ const AuthStore = create<AuthState>()(
             register: async (formdata: any)=>{
                 
                 try {
-                    await axios.post('/register', formdata);
+                    const url = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+                    await axios.post(`${url}/register`, formdata);
                     return { success: true}
                 } catch (error) {
                    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
@@ -45,10 +46,11 @@ const AuthStore = create<AuthState>()(
             login: async (formdata: any) => {
                
                 try {
+                    const url = process.env.NEXT_PUBLIC_BACKEND_URL || ''
                     const formData = new FormData()
                     formData.append('username', formdata.email);
                     formData.append('password', formdata.password);
-                    const response = await axios.post('/token',formData,{
+                    const response = await axios.post(`${url}/token`,formData,{
                                             headers: {
                                               'Content-Type': 'application/x-www-form-urlencoded', 
                                             },

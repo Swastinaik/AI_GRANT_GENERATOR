@@ -29,7 +29,8 @@ const Form = () => {
       const formDataToSend = new FormData();
       formDataToSend.append("file", file)
       formDataToSend.append("user_input", JSON.stringify(formData))
-      const data = await axios.post("/chat",formDataToSend,{
+      const url = process.env.NEXT_PUBLIC_BACKEND_URL || ''
+      const data = await axios.post(`${url}/chat`,formDataToSend,{
         withCredentials: true,
       })
       console.log("Response from server:", data.data)
