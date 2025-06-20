@@ -11,3 +11,4 @@ uvicorn
 passlib
 python-jose
 pypdf
+python-multipart
