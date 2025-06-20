@@ -94,7 +94,8 @@ async def login_for_access_token(response: Response, form_data: OAuth2PasswordRe
         key="access_token",
         value=access_token,
         httponly=True, # Set to True if using HTTPS
-        samesite="Lax",  # Adjust based on your requirements
+        samesite="None",
+        secure=True,# Adjust based on your requirements
         path="/"
     )
     return {"access_token": "Successfully done it ", "token_type": "bearer"}
