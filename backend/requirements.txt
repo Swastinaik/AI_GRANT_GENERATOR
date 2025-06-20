@@ -12,3 +12,4 @@ passlib
 python-jose
 pypdf
 python-multipart
+bcrypt
