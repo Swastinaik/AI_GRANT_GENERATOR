@@ -39,6 +39,7 @@ origins = [
     "http://localhost:3000",
     "http://localhost:8000",
     "http://localhost:3001",
+    f"https://{os.getenv('RENDER_EXTERNAL_HOSTNAME')}" if os.getenv("RENDER_EXTERNAL_HOSTNAME") else None,
 ]
 if vercel_frontend_url:
     origins.append(vercel_frontend_url)
