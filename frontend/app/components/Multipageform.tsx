@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 import Image from 'next/image';
 import MultiLoader from './Loader';
 import ErrorFallBack from './ErrorBoundary';

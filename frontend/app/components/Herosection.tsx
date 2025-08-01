@@ -1,5 +1,5 @@
 import react from 'react'
-import Hero from './Hero'
+
 import { BackgroundBeams } from '@/components/ui/background-beams'
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";

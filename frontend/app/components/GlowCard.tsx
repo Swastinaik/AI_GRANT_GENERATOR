@@ -1,6 +1,6 @@
 "use client"
 import { useRef } from "react";
-import { cardType } from "../lib/utils/types";
+
 const GlowCard = ({ card, index, children }: {card: any, index?: any, children: React.ReactNode}) => {
   // refs for all the cards
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
