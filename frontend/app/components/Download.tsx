@@ -4,16 +4,22 @@ import AuthStore from "../store/AuthStore";
 type DownloadProps = {
     downloadResponse: AI_Response[];
 };
-const Download = (downloadResponse: DownloadProps) => {
+const Download = (downloadResponse: any) => {
     
 // anchor link
     const downloadFile = async () => {
         try {
-            console.log("DOwnload response ----------", downloadResponse)
+            const { templateStyle, selectTemplate } = AuthStore.getState()
+            selectTemplate(templateStyle)
+            console.log("DOwnload response ----------", downloadResponse.downloadResponse)
             const formData = new FormData();
             formData.append("grant_proposal", JSON.stringify(downloadResponse))
-            const url = process.env.NEXT_PUBLIC_BACKEND_URL || ''
-            const response = await axios.post(`${url}/generate-pdf`, formData,{responseType: 'blob'});
+            if(templateStyle){
+            formData.append("template_style",templateStyle )
+            }
+            let url = process.env.NEXT_PUBLIC_BACKEND_URL || ''
+            url= '/api'
+            const response = await axios.post(`${url}/generate-pdf/${templateStyle}`, formData,{responseType: 'blob'});
             const file = new Blob([response.data], { type: 'application/pdf' });
             if (!file) {
                 throw new Error("File not found");

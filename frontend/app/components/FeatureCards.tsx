@@ -6,7 +6,7 @@ const FeatureCards = () => (
       {features.map(({ title, description }) => (
         <div
           key={title}
-          className="card-border rounded-xl p-8 flex flex-col gap-4"
+          className="card-border rounded-xl p-8 flex flex-col gap-4 bg-gray-900"
         >
           {/*<div className="size-14 flex items-center justify-center rounded-full">
             <img src={imgPath} alt={title} />

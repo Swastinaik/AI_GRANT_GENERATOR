@@ -13,3 +13,4 @@ python-jose
 pypdf
 python-multipart
 bcrypt
+langgraph

@@ -6,7 +6,6 @@ import os
 load_dotenv()
 
 MONGO_DETAILS = os.getenv("MONGO_URI")
-
 client = AsyncIOMotorClient(MONGO_DETAILS)
 
 database = client.user_database

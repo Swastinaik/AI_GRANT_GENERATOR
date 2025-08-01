@@ -13,52 +13,68 @@ export const features = [
   },
 ];
 
-export const words = [
-  { text: "Ideas", imgPath: "/ideas.svg" },
-  { text: "Concepts", imgPath: "/concepts.svg" },
-  { text: "AI", imgPath: "/ai-icon.svg" },
-  { text: "World", imgPath: "/globe.svg" },
-  { text: "Ideas", imgPath: "/ideas.svg" },
-  { text: "Concepts", imgPath: "/concepts.svg" },
-  { text: "AI", imgPath: "/ai-icon.svg" },
-  { text: "World", imgPath: "/globe.svg" },
+
+
+export const testimonials = [
+  {
+    name: "Esther Howard",
+    mentions: "@estherhoward",
+    review:
+      "I can't say enough good things about this grant generation platform. It was able to take our complex funding requirements and turn them into compelling, well-structured grant proposals. The AI's ability to understand our mission and translate it into fundable projects is outstanding.",
+    imgPath: "/images/client1.avif",
+  },
+  {
+    name: "Wade Warren",
+    mentions: "@wadewarren",
+    review:
+      "Using this AI grant platform was a game-changer for our non-profit. It transformed our scattered ideas into professional, competitive grant applications. The search and ranking functionality helped us identify the perfect funding opportunities. Highly recommend it for any organization seeking sustainable funding.",
+    imgPath: "/images/client3.jpg",
+  },
+  {
+    name: "Guy Hawkins",
+    mentions: "@guyhawkins",
+    review:
+      "Working with this grant generation system was an absolute pleasure. Its professionalism, accuracy, and dedication to delivering exceptional results were evident throughout our funding journey. The platform's enthusiasm for understanding every facet of our mission truly stands out. If you're seeking to elevate your grant applications and secure meaningful funding, this AI platform is the ideal partner.",
+    imgPath: "/images/client2.jpg",
+  },
+  {
+    name: "Marvin McKinney",
+    mentions: "@marvinmckinney",
+    review:
+      "This AI platform was incredible to work with. It turned our basic project ideas into comprehensive, compelling grant proposals that secured us three major funding opportunities. The intelligent search feature made finding relevant grants effortless.",
+    imgPath: "/images/client5.avif",
+  },
+  {
+    name: "Floyd Miles",
+    mentions: "@floydmiles",
+    review:
+      "The AI's expertise in grant writing is truly impressive. It delivered robust and compelling proposals for our education initiatives, and our funding success rate has significantly increased since we started using the platform. It's a true game-changer for non-profits!",
+    imgPath: "/images/client4.jpg",
+  },
+  {
+    name: "Albert Flores",
+    mentions: "@albertflores",
+    review:
+      "This grant generation platform was a pleasure to work with. It understood our mission perfectly and delivered proposals that exceeded our expectations. The AI's ability to match our projects with the right funding opportunities is top-notch.",
+    imgPath: "/images/client6.avif",
+  },
 ];
 
-export const expCards = [
+
+
+export const navLinks = [
+  
   {
-    review: "Adrian brought creativity and technical expertise to the team, significantly improving our frontend performance. His work has been invaluable in delivering faster experiences.",
-    imgPath: "/images/exp1.png",
-    logoPath: "/images/logo1.png",
-    title: "Frontend Developer",
-    date: "January 2023 - Present",
-    responsibilities: [
-      "Developed and maintained user-facing features for the Hostinger website.",
-      "Collaborated closely with UI/UX designers to ensure seamless user experiences.",
-      "Optimized web applications for maximum speed and scalability.",
-    ],
+    name: "Features",
+    link: "#features",
   },
   {
-    review: "Adrian’s contributions to Docker's web applications have been outstanding. He approaches challenges with a problem-solving mindset.",
-    imgPath: "/images/exp2.png",
-    logoPath: "/images/logo2.png",
-    title: "Full Stack Developer",
-    date: "June 2020 - December 2023",
-    responsibilities: [
-      "Led the development of Docker's web applications, focusing on scalability.",
-      "Worked with backend engineers to integrate APIs seamlessly with the frontend.",
-      "Contributed to open-source projects that were used with the Docker ecosystem.",
-    ],
+    name: "Testimonials",
+    link: "#testimonials",
   },
   {
-    review: "Adrian’s work on Appwrite’s mobile app brought a high level of quality and efficiency. He delivered solutions that enhanced our mobile experience & meet our product goals.",
-    imgPath: "/images/exp3.png",
-    logoPath: "/images/logo3.png",
-    title: "React Native Developer",
-    date: "March 2019 - May 2020",
-    responsibilities: [
-      "Built cross-platform mobile apps using React Native, integrating with Appwrite's backend services.",
-      "Improved app performance and user experience through code optimization and testing.",
-      "Coordinated with the product team to implement features based on feedback.",
-    ],
+    name: "Contact",
+    link: "#contact",
   },
 ];
+

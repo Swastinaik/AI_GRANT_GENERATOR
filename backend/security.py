@@ -7,7 +7,7 @@ from database import TokenData
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-SECRET_KEY = "your_secret_key"  # Change this to a strong, random string
+SECRET_KEY = "new_key_for_token"  # Change this to a strong, random string
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

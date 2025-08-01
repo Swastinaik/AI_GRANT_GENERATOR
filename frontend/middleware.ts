@@ -9,7 +9,7 @@ if(pathname === '/login' || pathname === '/register'){
     return NextResponse.redirect(new URL('/main', request.url))
   }
 }
-if(pathname === '/generate-grant'){
+if(pathname === '/generate-grant' || pathname === '/search-grant'){
   if(!isAuthenticated){
     return NextResponse.redirect(new URL('/register', request.url))
   }

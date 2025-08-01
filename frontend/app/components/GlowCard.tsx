@@ -1,7 +1,7 @@
 "use client"
 import { useRef } from "react";
 import { cardType } from "../lib/utils/types";
-const GlowCard = ({ card, index, children }: {card: cardType, index?: any, children: React.ReactNode}) => {
+const GlowCard = ({ card, index, children }: {card: any, index?: any, children: React.ReactNode}) => {
   // refs for all the cards
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -31,12 +31,13 @@ const GlowCard = ({ card, index, children }: {card: cardType, index?: any, child
     <div
       ref={(el: HTMLDivElement | null) => { cardRefs.current[index] = el; }}  
       onMouseMove={handleMouseMove(index)}
-      className="card card-border timeline-card rounded-xl p-10 mb-5 break-inside-avoid-column"
+      className="card card-border timeline-card rounded-xl p-10 mb-5 break-inside-avoid-column bg-gray-900"
     >
       <div className="glow"></div>
       <div className="flex items-center gap-1 mb-5">
         {Array.from({ length: 5 }, (_, i) => (
           <img key={i} src="/images/star.png" alt="star" className="size-5" />
+         
         ))}
       </div>
       <div className="mb-5">

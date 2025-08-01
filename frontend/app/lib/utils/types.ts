@@ -13,6 +13,17 @@ export type AI_Response = {
     answer: string;
 }
 
+export type Grant = {
+    id: string;
+    title: string;
+    agency: string;
+    agencyCode: string;
+    openDate: string;
+    closeDate: string;
+    link: string;
+    score?: string
+}
+
 
 
 

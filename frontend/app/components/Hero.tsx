@@ -4,6 +4,7 @@ import gsap from "gsap";
 import Link from "next/link";
 import { Meteors } from "@/components/magicui/meteors";
 import { words } from "../lib/utils/constants";
+import Button from "./Button";
 
 
 const Hero = () => {
@@ -16,12 +17,12 @@ const Hero = () => {
   });
 
   return (
-    <section id="hero" className="relative overflow-hidden">
+    <section id="hero" className="relative overflow-hidden -mt-1">
       <div className="absolute top-0 left-0 z-10">
         <img src="/images/bg.png" alt="" />
       </div>
       
-      <div className="hero-layout pr-20 -mt-3">
+      <div className="hero-layout pr-20 ">
         {/* LEFT: Hero Content */}
         <header className="flex flex-col justify-center md:w-full w-screen md:px-20 px-5">
           <div className="flex flex-col gap-7">
@@ -61,15 +62,16 @@ const Hero = () => {
         {/* RIGHT: 3D Model or Visual */}
         
         <Link href={"/generate-grant"}>
-        <button className="p-[3px] relative cursor-pointer">
+        <button className="p-[3px] relative cursor-pointer w-40 h-14 hover:scale-105 transition duration-300 ease-in-out">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
-          <div className="px-8 py-2  bg-white rounded-[10px]  relative group transition duration-200 text-black text-[18px] hover:bg-transparent hover:text-white">
+          <div className="px-8 py-2 text-white rounded-[10px]  relative group transition duration-200 text-black text-[18px] hover:bg-transparent hover:text-white">
             Create
           </div>
         </button>
         
         </Link>
        
+    
       </div>
 
       {/*<AnimatedCounter />*/}

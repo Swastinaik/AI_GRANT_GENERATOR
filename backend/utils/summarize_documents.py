@@ -58,7 +58,8 @@ def summarize_company_profile(company_text: str) -> CompanyProfileDetails:
         # Invoke the chain with the provided company text
         structured_company_data: CompanyProfileDetails = chain.invoke({"company_text": company_text, "format_instructions": parser.get_format_instructions()})
         print("Raw LLM Output:", structured_company_data.model_dump_json(indent=4))
-        return structured_company_data.model_dump_json(indent=4)
+        dict_data = structured_company_data.model_dump()
+        return dict_data
     except json.JSONDecodeError as json_error:
         print("JSON Decode Error:", json_error)
         print("Invalid JSON Output:", structured_company_data)

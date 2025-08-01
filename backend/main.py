@@ -6,19 +6,23 @@ import shutil
 import datetime
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
 sys.path.append(project_root)
-from fastapi import FastAPI, UploadFile, Form, HTTPException, Depends, status, Response, BackgroundTasks
+from fastapi import FastAPI, UploadFile, Form, HTTPException, Depends, status, Response, BackgroundTasks,Body, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from services.chat_services import generate_grant_proposal
+from ai_agents.generate_grant import GrantGeneration
 from utils.document_uploader import generate_loader, convert_docs_to_text
 from utils.summarize_documents import summarize_company_profile
-from utils.generate_pdf import generate_pdf, delete_file
+from ai_agents.search_grant import SearchGrants
+from templates.templates import generate_pdf, delete_file
 from utils.generate_filename import generate_alphabet_string
 import security, database
 from datetime import timedelta
 from dotenv import load_dotenv
+import asyncio
+import base64
+import json
 load_dotenv()
 
 
@@ -32,7 +36,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 async def get_user(email: str):
     user = await database.user_collection.find_one({"email": email})
     if user:
+        user["_id"] = str(user["_id"])
         return user
+    else:
+        return None
 
 
 origins = [
@@ -77,6 +84,7 @@ async def create_user(user: database.UserCreate):
     del user_object["hashed_password"]
     return user_object
 
+
 @app.post("/token")
 async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     user = await get_user(form_data.username) # Here username is the email
@@ -98,8 +106,9 @@ async def login_for_access_token(response: Response, form_data: OAuth2PasswordRe
         secure=True,# Adjust based on your requirements
         path="/"
     )
-    return {"access_token": "Successfully done it ", "token_type": "bearer"}
-
+    del user['hashed_password']
+    return {"user": user}
+"""
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -107,6 +116,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        
         payload = security.jwt.decode(token, security.SECRET_KEY, algorithms=[security.ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
@@ -118,39 +128,121 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
     return user
+"""
+
+
+async def get_current_user(request:Request):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    token = request.cookies.get("access_token")
+    token_parts = token.split('.')
+    header = json.loads(base64.b64decode(token_parts[0] + '=='))
+    payload = json.loads(base64.b64decode(token_parts[1] + '=='))
+
+    print(f"Token header: {header}")
+    print(f"Token payload: {payload}")
+    print(f"Your SECRET_KEY : {security.SECRET_KEY}")
+    print(f"Your ALGORITHM: {security.ALGORITHM}")
+    print(token)
+    if not token:
+        raise credentials_exception
+    if token and  token.startswith("Bearer "):
+        token = token[7:]
+    try:
+        payload = security.jwt.decode(token, security.SECRET_KEY, algorithms=[security.ALGORITHM])
+        print(payload)
+        email: str = payload.get("sub")
+        print(email)
+        if email is None:
+            print("email is not there")
+            raise credentials_exception
+        token_data = security.TokenData(email=email)
+    except security.JWTError:
+        print("somethign ")
+        raise credentials_exception
+        
+    user = await get_user(email=token_data.email)
+    if user is None:
+        raise credentials_exception
+    return user
+
+
+
+@app.post('/logout')
+async def logout(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        samesite="None",
+        secure=True
+    )
+    return {"message": "Securely logout user"}
+
 
 #Routes to handle chat functionality
-@app.post("/chat")
-async def chat(file: UploadFile, user_input: str = Form(...)):
+@app.post("/generate-grant")
+async def chat(backgroundtaks: BackgroundTasks, file: UploadFile, user_input: str = Form(...)):
     user_input = json.loads(user_input)
-    print(" user_input ", user_input)
-    print(" user_input after remove_outer_quotes ", user_input)
     try:
-        file_location = os.path.join(UPLOAD_DIRECTORY, "new_file.pdf")
+        file_location = os.path.join(UPLOAD_DIRECTORY, file.filename)
         with open(file_location, "wb+") as file_object:
             shutil.copyfileobj(file.file, file_object)
         absolute_file_path = os.path.abspath(file_location)
         loader = generate_loader(absolute_file_path)
         company_text = convert_docs_to_text(loader)
-        company_detail = summarize_company_profile(company_text)
-        print("company_detail ------ \n ", company_detail)
+        organizations_detail = summarize_company_profile(company_text)
+        print("type of ",type(organizations_detail))
         # Generate the grant proposal using the chat service
-        grant_proposal = generate_grant_proposal(company_object=company_detail, user_input=user_input)
-        print("grant_proposal ------ \n", grant_proposal)
+        generate_grant= GrantGeneration(user_input=user_input,organizations_detail=organizations_detail)
+        grant_proposal=await generate_grant.run_graph()
+        backgroundtaks.add_task(delete_file, absolute_file_path)
         return grant_proposal
+        
     except Exception as e:
         print("Error-------------------------", e)
         traceback.print_exc()
         return {"error": "An error occurred while processing the request.", "details": str(e)}
 
+class SearchGrantInput(BaseModel):
+    keyword: str
+    description: str
+@app.post('/search-grant')
+async def search_grants(user_input: SearchGrantInput=Body(...)):
+    try:
+        search_grant=SearchGrants(user_input.keyword,user_input.description)
+        result= await search_grant.invoke_graph()
+        return result
+    except json.JSONDecodeError:  # If you still need manual parsing elsewhere
+        raise HTTPException(status_code=400, detail="Invalid JSON input")
+    except ValueError as e:  # Example: Catch specific errors from SearchGrants
+        raise HTTPException(status_code=400, detail=f"Invalid input: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred while searching for grants: {str(e)}")
+"""
 #Just a test route to check if the server is running 
-@app.get("/users/me/", response_model=database.User)
+@app.post("/api/me/", response_model=database.User)
 async def read_users_me(current_user: database.User = Depends(get_current_user)):
+    if 'hashed_password' in current_user:
+        del current_user['hashed_password']
     return current_user
+"""
+@app.post("/me/", response_model=database.User)
+async def read_users_me(request: Request):
+    print('hi there')
+    current_user = await get_current_user(request)
+    if current_user:
+        if 'hashed_password' in current_user:
+            del current_user['hashed_password']
+        return current_user
+    else:
+        return None
 
 # Route to generate PDF from the grant proposal
-@app.post("/generate-pdf")
-def generate_pdf_for_request(background_tasks: BackgroundTasks, grant_proposal: str = Form(...)):
+@app.post("/generate-pdf/{style}")
+def generate_pdf_for_request(background_tasks: BackgroundTasks, style: str, grant_proposal: str = Form(...)):
     try:
         grant_proposal = json.loads(grant_proposal)
         print("grant_proposal in generate_pdf ", grant_proposal['downloadResponse'])
@@ -160,10 +252,12 @@ def generate_pdf_for_request(background_tasks: BackgroundTasks, grant_proposal: 
         filename = generate_alphabet_string(4) + "_grant_proposal.pdf"
         file_path = os.path.join("tmp", filename) 
         os.makedirs("tmp", exist_ok=True)
-        generate_pdf(content_list, file_path)
+        generate_pdf(content_list, file_path, template_style=style)
         background_tasks.add_task(delete_file, file_path)
         return FileResponse(file_path, filename=filename)
     except Exception as e:
         print("Error generating PDF:", e)
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="An error occurred while generating the PDF.")
+    
+
