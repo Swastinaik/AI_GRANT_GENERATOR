@@ -64,7 +64,7 @@ const AuthStore = create<AuthState>()(
                     const formData = new FormData()
                     formData.append('username', formdata.email);
                     formData.append('password', formdata.password);
-                    const response = await axios.post(`${url}/token`,formData,{
+                    const response = await axios.post(`${url}token`,formData,{
                                             headers: {
                                               'Content-Type': 'application/x-www-form-urlencoded', 
                                             },
