@@ -86,6 +86,7 @@ const AuthStore = create<AuthState>()(
                     const response = await axios.post('api/me/',{},{
                         withCredentials: true
                     })
+                    console.log('response data',response)
                     if(response.data.username){
                         console.log('from authstore', response.data.username)
                         set({
