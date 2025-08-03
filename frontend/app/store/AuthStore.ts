@@ -83,7 +83,7 @@ const AuthStore = create<AuthState>()(
             },
             checkAuth: async ()=>{
                 try {
-                    const response = await axios.post('api/me',{},{
+                    const response = await axios.post('/api/me/',{},{
                         withCredentials: true
                     })
                     console.log('response data',response)
