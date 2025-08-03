@@ -229,7 +229,7 @@ async def read_users_me(current_user: database.User = Depends(get_current_user))
         del current_user['hashed_password']
     return current_user
 """
-@app.post("/me/", response_model=database.User)
+@app.post("/me", response_model=database.User)
 async def read_users_me(request: Request):
     print('hi there')
     current_user = await get_current_user(request)
