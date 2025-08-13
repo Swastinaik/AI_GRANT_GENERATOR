@@ -21,7 +21,7 @@ interface AuthState{
 }
 
 
-const AuthStore = create<AuthState>()(
+const useAuthStore = create<AuthState>()(
     persist(
         (set, get) =>({
             
@@ -31,8 +31,8 @@ const AuthStore = create<AuthState>()(
             register: async (formdata: any)=>{
                 set({isLoading: true})
                 try {
-                    
-                    await axios.post(`api/register`, formdata);
+                    const api = process.env.NEXT_PUBLIC_API_KEY || 'api'
+                    await axios.post(`${api}/register`, formdata);
                     set({isLoading: false})
                     return { success: true}
                 } catch (error) {
@@ -46,7 +46,8 @@ const AuthStore = create<AuthState>()(
             
              logout: async () =>{
                 try {
-                    await axios.post('api/logout',{},{
+                    const api = process.env.NEXT_PUBLIC_API_KEY || 'api'
+                    await axios.post(`${api}/logout`,{},{
                         withCredentials: true
                     })
                 } catch (error) {
@@ -60,11 +61,11 @@ const AuthStore = create<AuthState>()(
             login: async (formdata: any) => {
                set({isLoading: true})
                 try {
-                    const url = 'api/'
+                    const api = process.env.NEXT_PUBLIC_API_KEY || 'api'
                     const formData = new FormData()
                     formData.append('username', formdata.email);
                     formData.append('password', formdata.password);
-                    const response = await axios.post(`${url}token`,formData,{
+                    const response = await axios.post(`${api}/token`,formData,{
                                             headers: {
                                               'Content-Type': 'application/x-www-form-urlencoded', 
                                             },
@@ -78,12 +79,13 @@ const AuthStore = create<AuthState>()(
                     return { success : true, message: 'Login successfull'}
                 } catch (error) {
                     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+                    set({isLoading: false})
                     return { success: false, message: errorMessage}
                 }
             },
             checkAuth: async ()=>{
                 try {
-                    const response = await axios.post('/api/me/',{},{
+                    const response = await axios.post('/api/me',{},{
                         withCredentials: true
                     })
                     console.log('response data',response)
@@ -126,4 +128,4 @@ const AuthStore = create<AuthState>()(
     )
 )
 
-export default AuthStore;
+export default useAuthStore;

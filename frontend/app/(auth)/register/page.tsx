@@ -4,19 +4,19 @@ import React ,{useState} from 'react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { RetroGrid } from "@/components/magicui/retro-grid";
+import { ToastContainer, toast } from 'react-toastify';
+
 import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import AuthStore from '@/app/store/AuthStore'
+import useAuthStore from '@/app/store/AuthStore'
 import { useRouter } from 'next/navigation'
 import { BackgroundGradient } from '@/components/ui/background-gradient'
 import { BackgroundLines } from '@/components/ui/background-lines'
@@ -26,9 +26,7 @@ const formSchema = z.object({
   username: z.string().min(2, {
     message: "Username must be at least 2 characters.",
   }),
-  email: z.string().min(2, {
-    message: "Email must be at least 2 characters.",
-  }),
+  email: z.string().email("Invalid Email"),
   password: z.string().min(2, {
     message: "password must be at least 2 characters.",
   }),
@@ -36,9 +34,8 @@ const formSchema = z.object({
 
  function ProfileForm() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { register} = AuthStore.getState()
+  const register = useAuthStore((s) => s.register);
+  const isLoading = useAuthStore((s) => s.isLoading);
     const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,22 +45,23 @@ const formSchema = z.object({
     },
   })
  
+  function displayToast(error: any){
+      toast.error(error)
+    }
+
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
     try {
       const response = await register(values);
       if(response.success !== true){
         throw new Error("Error while registering...")
       }
-      console.log('Registration successful:');
+      console.log(isLoading)
       router.push('/login')
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
-         console.log(error)
-    } finally {
-      setLoading(false);
-    }
+    } catch (e) {
+      const errorMEssgage = e instanceof Error ? e.message : "Error While registering"
+       displayToast(errorMEssgage)
+    } 
   }
  
   return (
@@ -112,13 +110,14 @@ const formSchema = z.object({
             </FormItem>
           )}
         />
-        {error && <p className='text-red-500 text-sm'>{error}</p>}
-        <Button  className="cursor-pointer bg-black-50" type="submit">{loading ? "Loading..." : "Sign Up"}</Button>
+      
+        <Button  className="cursor-pointer bg-black-50" type="submit">{isLoading ? "Loading..." : "Sign Up"}</Button>
         <p className=' flex justify-center items-center gap-6 text-sm text-white'>Already has an account <Link href="/login" className=' text-sm text-blue-700 h-0 w-0'>Login</Link></p>
       </form>
       </BackgroundGradient>
        </BackgroundLines>
       </div>
+       <ToastContainer/> 
     </Form>
   )
 }

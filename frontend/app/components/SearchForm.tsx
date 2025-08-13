@@ -1,7 +1,7 @@
 'use client';
 import axios from 'axios';
 import { useState } from 'react';
-import {MultiStepLoader} from './multi-step-loader'
+import LoaderComponent from './Loader';
 import ErrorFallBack from './ErrorBoundary'
 import GrantGrid from './GrantGrid'
 
@@ -12,41 +12,16 @@ export default function KeywordDescriptionForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [searchData, setSearchData] = useState([])
-  const loadingStates = [
-    {
-      text: "Analyzing the input",
-    },
-    {
-      text: "Ai is thinking",
-    },
-    {
-      text: "Generating response",
-    },
-    {
-      text: "Loading the data",
-    },
-    {
-      text: "Processing the request",
-    },
-    {
-      text: "Please wait",
-    },
-    {
-      text: "Almost there",
-    },
-    {
-      text: "Finalizing the output",
-    },
-  ];
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setLoading(true)
-      const url = '/api'
+      const api = process.env.NEXT_PUBLIC_API_KEY || 'api'
       let user_input:any = {}
       user_input['keyword'] = keyword
       user_input['description'] = description
-      const response = await axios.post(`${url}/search-grant`, user_input)
+      const response = await axios.post(`${api}/search-grant`, user_input)
       console.log(response.data)
       setSearchData(response.data)
     } catch (error) {
@@ -61,7 +36,7 @@ export default function KeywordDescriptionForm() {
   return (
     <>
     {
-      loading ? <MultiStepLoader loadingStates={loadingStates} loading={loading} duration={2000} loop={true} /> : error.length > 0 ? <ErrorFallBack error={error} /> : searchData.length > 0 ? <GrantGrid grants={searchData} /> : (
+      loading ? <LoaderComponent/> : error.length > 0 ? <ErrorFallBack error={error} /> : searchData.length > 0 ? <GrantGrid grants={searchData} /> : (
     <div className="dark bg-gradient-to-b from-black via-neutral-900 to-black h-screen py-8">
       <div className="w-full max-w-3xl mx-auto px-6 sm:px-12">
         <form
