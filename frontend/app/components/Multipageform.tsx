@@ -7,6 +7,7 @@ import ErrorFallBack from './ErrorBoundary';
 import AuthStore from '../store/AuthStore';
 import axios from 'axios';
 import NewEditor from './NewEditor';
+import LoaderComponent from './Loader';
 const templates = [
   { name: 'luxury', image: '/images/luxury.png' },
   { name: 'elegant', image: '/images/elegant.png' },
@@ -67,6 +68,7 @@ export default function MultiStepTemplateForm() {
 
   const handleGenerate = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    setLoading(true)
     try {
       selectTemplate(confirmedTemplate)
       const formDataToSend = new FormData()
@@ -76,8 +78,8 @@ export default function MultiStepTemplateForm() {
       }
       formDataToSend.append('file',selectedFile)
       formDataToSend.append('user_input',JSON.stringify(formData))
-      const url = '/api'
-      const data = await axios.post(`${url}/generate-grant`,formDataToSend,{
+      const api = process.env.NEXT_PUBLIC_API_KEY  || 'api'
+      const data = await axios.post(`${api}/generate-grant`,formDataToSend,{
         withCredentials: true,
       })
       setResponse(data.data)
@@ -88,6 +90,8 @@ export default function MultiStepTemplateForm() {
       setError("There is error while generating the conent")
       console.log(e)
       throw new Error(error)
+    } finally{
+      setLoading(false)
     }
   };
 
@@ -100,7 +104,7 @@ export default function MultiStepTemplateForm() {
 
   return (
     <>
-    { loading ? <MultiLoader/>:error.length > 0 ?  <ErrorFallBack error={error}/>: response ? <NewEditor grants={response}/>:(
+    { loading ? <LoaderComponent/> :error.length > 0 ?  <ErrorFallBack error={error}/>: response ? <NewEditor grants={response}/>:(
     <div className="dark bg-gradient-to-b from-black via-neutral-900 to-black min-h-screen py-8">
       <div className="w-full max-w-6xl mx-auto px-6 sm:px-12">
         <div className="w-full">
@@ -296,7 +300,7 @@ export default function MultiStepTemplateForm() {
                     type="button"
                     onClick={handleGenerate}
                     disabled={!isStepValid(currentStep)}
-                    className="flex-1 py-4 ml-2 text-lg rounded-xl font-bold transition-all bg-gradient-to-r from-green-500 to-green-700 text-white shadow-lg hover:from-green-600 hover:to-green-800 disabled:opacity-50"
+                    className="flex-1 py-4 ml-2 text-lg rounded-xl font-bold transition-all bg-gradient-to-r from-green-500 to-green-700 text-white shadow-lg hover:from-green-600 hover:to-green-800 disabled:opacity-50 cursor-pointer"
                   >
                     Generate
                   </button>

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Editor } from 'primereact/editor';
 import Download from "./Download";
+import BackButton from "./BackButton";
 
 
 type GrantType = Record<string, string>
@@ -34,7 +35,7 @@ const NewEditor = ({grants}: {grants: GrantType})=> {
     return (
         <div className="flex flex-col justify-center items-center">
             <div className="flex justify-around items-center w-full bg-black-100 p-3">
-            
+            <BackButton/>
             <select
                 className="block w-[1/2] px-4 py-2 text-white bg-gray-900 border border-gray-700 rounded-md shadow-sm focus:outline-none ring-2 ring-blue-500 focus:border-transparent appearance-none transition duration-200 ease-in-out"
                 value={currentGrant.section}
@@ -48,9 +49,11 @@ const NewEditor = ({grants}: {grants: GrantType})=> {
                     ))
                 }
             </select>
+            
             <Download downloadResponse={grantsData} />
             </div>
             <Editor value={currentGrant.answer} onTextChange={(e:any) => editorOnChange(e)} style={{ height: "90vh", width: "100vw", border: "rounded" }} />
+            
         </div>
     )
 }
