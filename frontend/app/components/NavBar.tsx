@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 
 import { navLinks } from "../lib/utils/constants"
-import useAuthStore from "../store/hooks/useAuthStore";
+import useAuthStore from '@/app/store/AuthStore'
 import Link from "next/link";
 const NavBar = () => {
-  const { user, isAuthenticated, checkAuth} = useAuthStore()
+  const user = useAuthStore((s)=> (s.user))
+  const isAuthenticated = useAuthStore((s)=> (s.isAuthenticated))
+  const checkAuth = useAuthStore((s)=> (s.checkAuth))
 
   async function refreshAuth(){
     console.log(isAuthenticated)
