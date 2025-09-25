@@ -32,12 +32,7 @@ class additional_section_parser(TypedDict):
 os.environ["GOOGLE_API_KEY"]=os.getenv("GOOGLE_API_KEY")
 llm=ChatGoogleGenerativeAI(model='gemini-2.0-flash')
 
-base_prompt = BASE_PROMPT = """
-    You are a professional grant writer.
-    You are writing a grant proposal for a non-profit organization.
-    always add the "\n" at the end of the sentence.
-    if there is a line break needed add "\n" at the end of the sentence.
-"""
+#base_prompt = BASE_PROMPT = 
 
 #Nodes
 class GrantGeneration:
@@ -45,6 +40,14 @@ class GrantGeneration:
     def __init__(self, user_input, organizations_detail):
         self.user_input: Dict[str, Any] = user_input
         self.organizations_detail: Dict[str, Any] = organizations_detail
+        self.language = user_input['language']
+        self.base_prompt= f"""
+            You are a professional grant writer.
+            You are writing a grant proposal for a non-profit organization.
+            always add the "\n" at the end of the sentence.
+            if there is a line break needed add "\n" at the end of the sentence.
+            Always generate this whole section in this language: {self.language} mandatory
+        """
         self.grants: Dict[str, Any]= {}
         self.app = None
         self.workflow=StateGraph(GraphState)
@@ -72,6 +75,7 @@ class GrantGeneration:
 
     async def cover_letter(self, state: GraphState):
         user_input=state['user_input']
+        print("Base prompt", self.base_prompt)
         organizations_detail=state['organizations_detail']
         project_title=user_input['project_title']
         
@@ -106,7 +110,7 @@ class GrantGeneration:
             ])
             output_parser=StrOutputParser()
             chain = prompt|llm|output_parser
-            cover_letter_output= await chain.ainvoke({'project_title': project_title,'base_prompt':base_prompt, 'statement_of_need': statement_of_need, 'budget': budget, 'profile_summary':profile_summary,'mission_vision':mission_vision,'section': section,'funders_detail': funders_detail})
+            cover_letter_output= await chain.ainvoke({'project_title': project_title,'base_prompt':self.base_prompt, 'statement_of_need': statement_of_need, 'budget': budget, 'profile_summary':profile_summary,'mission_vision':mission_vision,'section': section,'funders_detail': funders_detail})
             updated_grants = state.get('grants',{}).copy()
             updated_grants[section]=cover_letter_output
             updated_grants['Project Title'] = project_title
@@ -116,7 +120,6 @@ class GrantGeneration:
 
     async def executive_summary(self,state: GraphState):
         section = 'Executive Summary'
-        print(f"Generating section: {section}...")
 
         try:
             user_input = state['user_input']
@@ -166,7 +169,7 @@ class GrantGeneration:
                 'evaluation_method': evaluation_method,
                 'achievements': achievements,
                 'mission_vision': mission_vision,
-                'base_prompt':base_prompt
+                'base_prompt':self.base_prompt
             })
 
             updated_grants = state.get('grants', {}).copy()
@@ -179,7 +182,7 @@ class GrantGeneration:
 
     async def statement_of_need(self,state: GraphState):
         section = 'Statement Of Need'
-        print(f"Generating section: {section}...")
+        
 
         try:
             user_input = state['user_input']
@@ -219,7 +222,7 @@ class GrantGeneration:
                 'target_audience': target_audience,
                 'challenges': challenges,
                 'history': history,
-                'base_prompt':base_prompt
+                'base_prompt':self.base_prompt
             })
             updated_grants = state.get('grants', {}).copy()
             updated_grants[section] = output
@@ -232,7 +235,6 @@ class GrantGeneration:
 
     async def project_description(self, state: GraphState):
         section = 'Project Description'
-        print(f"Generating section: {section}...")
 
         try:
             user_input = state['user_input']
@@ -276,7 +278,7 @@ class GrantGeneration:
                 'challenges': challenges,
                 'mission_vision': mission_vision,
                 'achievements': achievements,
-                'base_prompt':base_prompt
+                'base_prompt':self.base_prompt
             })
             updated_grants = state.get('grants', {}).copy()
             updated_grants[section] = output
@@ -289,7 +291,7 @@ class GrantGeneration:
 
     async def organization_background(self,state: GraphState):
         section = 'Organization Background'
-        print(f"Generating section: {section}...")
+        
 
         try:
             organizations_detail = state['organizations_detail']
@@ -329,7 +331,7 @@ class GrantGeneration:
                 'mission_vision': mission_vision,
                 'achievements': achievements,
                 'overall_summary': overall_summary,
-                'base_prompt':base_prompt
+                'base_prompt':self.base_prompt
             })
 
             updated_grants = state.get('grants', {}).copy()
@@ -341,7 +343,7 @@ class GrantGeneration:
 
     async def evaluation_plan(self,state: GraphState):
         section = 'Evaluation Plan'
-        print(f"Generating section: {section}...")
+        
         try:
             user_input = state['user_input']
 
@@ -373,7 +375,7 @@ class GrantGeneration:
                 'evaluation_method': evaluation_method,
                 'project_goals': project_goals,
                 'target_audience': target_audience,
-                'base_prompt':base_prompt
+                'base_prompt':self.base_prompt
             })
 
             updated_grants = state.get('grants', {}).copy()
@@ -386,7 +388,7 @@ class GrantGeneration:
 
     async def budget_section(self,state: GraphState):
         section = 'Budget Section'
-        print(f"Generating section: {section}...")
+        
         try:
             user_input = state['user_input']
 
@@ -414,7 +416,7 @@ class GrantGeneration:
             output = await chain.ainvoke({
                 'budget': budget,
                 'project_description': project_description,
-                'base_prompt':base_prompt
+                'base_prompt':self.base_prompt
             })
 
             updated_grants = state.get('grants', {}).copy()
@@ -427,7 +429,7 @@ class GrantGeneration:
 
     async def sustainibility_plan(self,state: GraphState):
         section = 'Sustainibility Plan'
-        print(f"Generating section: {section}...")
+        
         try:
             user_input = state.get('user_input', {})
             #print("user input ",user_input)
@@ -463,7 +465,7 @@ class GrantGeneration:
                 'project_description': project_description,
                 'history': history,
                 'achievements': achievements,
-                'base_prompt':base_prompt
+                'base_prompt':self.base_prompt
             })
 
             updated_grants = state.get('grants', {}).copy()
@@ -547,7 +549,7 @@ class GrantGeneration:
             "Budget Section", "Sustainibility Plan",new_section,"Funders Name","Senders Name","Project Title"
         ]
         new_grant = rearrange_dict(grant_sections, sequence)
-        print("NEw gants ----------------------------------\n",new_grant)
+        
         """
         full_document = "\n\n---\n\n".join(
             f"## {section.replace('_', ' ').title()}\n\n{grant_sections.get(section, 'Content not available.')}"
