@@ -31,7 +31,7 @@ def convert_docs_to_text(loader: (PyPDFLoader | UnstructuredWordDocumentLoader |
     docs = []
     for d in loader.load():
         docs.append(d)
-    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=100)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=10)
     split_docs = splitter.split_documents(docs)
     document_content = [doc.page_content for doc in split_docs]
     combined_document = "\n".join(document_content)

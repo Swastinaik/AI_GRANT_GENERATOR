@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - MONGO_URL=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/${MONGO_INITDB_DATABASE}?authSource=admin
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app   # for dev: hot-reload. Remove for production.
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app   # for dev: live editing. Remove for production.
+
+volumes:
+  mongo-data:

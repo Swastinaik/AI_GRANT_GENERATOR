@@ -20,7 +20,7 @@ from utils.generate_filename import generate_alphabet_string
 import security, database
 from datetime import timedelta
 from dotenv import load_dotenv
-import asyncio
+from ai_agents.resume_agent.agent import ResumeAgent
 import base64
 import json
 load_dotenv()
@@ -260,4 +260,48 @@ def generate_pdf_for_request(background_tasks: BackgroundTasks, style: str, gran
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="An error occurred while generating the PDF.")
     
+"""
 
+class ResumeData(BaseModel):
+    job_description: str
+    user_information: str
+    style: str
+
+"""
+
+@app.post("/resume-generator")
+def generate_resume(background_tasks: BackgroundTasks,
+                    job_description: str= Form(...),
+                    style: str= Form(...),
+                    user_information: str = Form(None),
+                    file: UploadFile | None = None):
+ 
+    job_description = job_description
+    style = style
+    agent = None
+    file_location = None
+    if file:
+        file_location = os.path.join(UPLOAD_DIRECTORY, file.filename)
+        with open(file_location, "wb+") as file_object:
+            shutil.copyfileobj(file.file, file_object)
+        agent = ResumeAgent(job_description=job_description, file_path=file_location,style=style)
+    else:
+        user_input = user_information
+        agent = ResumeAgent(job_description=job_description,user_input = user_input, style=style)
+    output_file_path = agent.run_graph()
+    if file_location and os.path.exists(file_location):
+        os.remove(file_location)
+    file_name = os.path.basename(output_file_path)
+    background_tasks.add_task(delete_file, output_file_path)
+    response = FileResponse(
+        path=output_file_path,
+        filename=file_name,
+        media_type="application/pdf"
+    )
+    return response
+
+    
+
+
+
+    

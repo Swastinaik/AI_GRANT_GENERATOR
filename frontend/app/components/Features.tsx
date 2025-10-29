@@ -81,7 +81,7 @@ const FeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section className="bg-black py-20 px-4 sm:px-6 lg:px-8">
+    <section className="bg-black py-20 px-4 sm:px-6 lg:px-8 mt-16">
       <div className="container mx-auto text-center">
         <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-6 animate-fade-in-up">
           Unlock Your Grant Potential
