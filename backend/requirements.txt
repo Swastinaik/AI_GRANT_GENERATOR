@@ -15,5 +15,5 @@ python-multipart
 bcrypt
 langgraph
 redis
-docx
+python-docx
 pydantic[email]
