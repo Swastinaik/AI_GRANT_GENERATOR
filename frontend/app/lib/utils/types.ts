@@ -13,7 +13,7 @@ export type AI_Response = {
     answer: string;
 }
 
-export type Grant = {
+export type GrantType = {
     id: string;
     title: string;
     agency: string;
@@ -25,6 +25,10 @@ export type Grant = {
 }
 
 
+export interface DownloadProps {
+    file?: Blob | null
+    fileName?: string | null
+}
 
 
 

@@ -1,23 +1,36 @@
 "use client"
-import React ,{useState} from 'react'
+import React ,{use, useState} from 'react'
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 import { z } from "zod"
 import { useRouter } from 'next/navigation'
-import { ToastContainer, toast } from 'react-toastify';
+
+import { BackgroundGradient } from "@/components/ui/background-gradient";
 import { Button } from "@/components/ui/button"
-import { BackgroundGradient } from '@/components/ui/background-gradient'
-import { BackgroundLines } from '@/components/ui/background-lines'
+import { toast } from "sonner"
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group"
 import useAuthStore from '@/app/store/AuthStore'
 import Link from 'next/link'
 
@@ -29,9 +42,11 @@ const formSchema = z.object({
 })
 
 export default function ProfileForm() {
+  const setAccessToken = useAuthStore((state)=>state.setAccessToken)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const login = useAuthStore((s)=>(s.login))
-  const isLoading = useAuthStore((s)=> (s.isLoading))
+  
     const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,64 +60,101 @@ export default function ProfileForm() {
   }
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    
     try {
-      const response = await login(values);
-      if(response.success !== true){
-        throw new Error("Error while login")
+      setIsLoading(true);
+      const formData = new URLSearchParams()
+      formData.append("username", values.email)
+      formData.append("password", values.password)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+        })
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Login failed');
       }
-      router.push('/main')
-    }catch(error){
-      const errorMEssage = error instanceof Error ? error.message : 'An unexpected error occurred'
-      displayToast(errorMEssage)
+      const data = await response.json();
+      console.log("Access Token:", data.access_token);
+      setAccessToken(data.access_token);
+      router.push('/me');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      displayToast(errorMessage);
     }
+    finally{
+      setIsLoading(false);
+    }
+   
     
   }
  
   return (
-    <Form {...form} >
-      
-      <div  className='flex justify-center items-center h-screen bg-black' >
-        <BackgroundLines className='flex flex-col justify-center items-center h-full w-full bg-black'>
-        <BackgroundGradient >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5  p-6 rounded-2xl bg-black-100 w-96 h-96">
-        <h1 className='text-3xl font-bold text-white text-center'>Login</h1>
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your Email" {...field}  className='w-full'/>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter your password" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <div className='min-h-screen flex justify-center items-center'>
+    <BackgroundGradient className='w-96 sm:max-w-md"'>
+    <Card className="w-full sm:max-w-md">
+      <h2 className='text-2xl text-center font-semibold'>Sign In</h2>
+      <CardContent>
+        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup>
+             <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="email">
+                    Email
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="email"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Enter your email"
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="password">
+                    Password
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="password"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Enter your password"
+                    autoComplete="off"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            </FieldGroup>
+        </form>
+      </CardContent>
+      <CardFooter className='flex items-center justify-center'>
        
-        <Button className='cursor-pointer bg-black-50' type="submit">{isLoading ? "Loading..." : "Login"}</Button>
-        <p className=' flex justify-center items-center gap-8 text-sm text-white'>Don't have an account <Link href="/register" className=' text-sm text-blue-700 h-0 w-0'>Register</Link></p>
-      </form>
-     </BackgroundGradient>
-     </BackgroundLines>
-      </div>
-     
-       <ToastContainer/> 
-    </Form>
+          <Button type="submit" form="form-rhf-demo" className="w-full" disabled={isLoading}>
+            {isLoading ? 'Signing In...' : 'Sign In'}
+          </Button>
+   
+      </CardFooter>
+       <CardDescription className='text-center'>
+          Already have an account? <Link href="/register" className='text-blue-500 hover:underline'>Sign Up</Link>
+        </CardDescription>
+    </Card>
+    </BackgroundGradient>
+    </div>
   )
 }
 

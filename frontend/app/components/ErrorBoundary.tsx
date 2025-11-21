@@ -1,11 +1,14 @@
 import React from 'react'
-
+import HomeButton from './HomeButton'
 const ErrorFallBack = (error: any) => {
   return (
-    <div className='h-full w-full flex justify-center items-center'>
-        <h1>Something went wrong</h1>
-        <p className='text-red-500'>{error.message}</p>
-        <p className='text-red-500'>Please try again later</p>
+    <div className='flex flex-col space-y-2 justify-center items-center h-screen w-screen'>
+    <div className='flex '>
+        <h1>Something went wrong{' '} </h1>
+        <p className='text-destructive'>{ error.message}</p>
+        <p className='text-destructive'>Please try again later</p>
+    </div>
+    <HomeButton/>
     </div>
   )
 }

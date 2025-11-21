@@ -2,28 +2,20 @@ import AuthStore from "../AuthStore"
 
 const useAuthStore = ()=> {
     const { 
-        user,
-        isAuthenticated,
-        login,
-        register,
-        logout,
-        checkAuth,
+        accessToken,
+        setAccessToken,
         selectTemplate,
         templateStyle,
-        isLoading
+       
         
     } = AuthStore.getState()
 
     return {
-        user,
-        isAuthenticated,
-        login,
-        register,
-        logout,
-        checkAuth,
+       accessToken,
+        setAccessToken,
         selectTemplate,
         templateStyle,
-        isLoading
+        
     }
 }
 
