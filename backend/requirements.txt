@@ -16,3 +16,4 @@ bcrypt
 langgraph
 redis
 docx
+pydantic[email]
