@@ -44,7 +44,7 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
         value=refresh_token,
         httponly=True,
         secure=True,  # set True in production with HTTPS
-        samesite="None",
+        samesite="none",
         max_age=60 * 60 * 24 * settings.REFRESH_TOKEN_EXPIRE_DAYS,
         path="/"
     )
