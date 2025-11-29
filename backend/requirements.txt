@@ -17,3 +17,4 @@ langgraph
 redis
 python-docx
 pydantic[email]
+argon2_cffi
