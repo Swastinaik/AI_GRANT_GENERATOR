@@ -82,15 +82,23 @@ export const navLinks = [
 export const services = [
   {
     name: "Grant Writing",
-    link: "/generate-grant"
+    link: "/generate-grant",
+    description: "Click to generate Grant."
   },
   {
     name: "Search Grants",
-    link: "/search-grant"
+    link: "/search-grant",
+    description: "Click to search for Grants."
   },
   {
     name: "Resume Generation",
-    link: "/resume-generate"
+    link: "/resume-generate",
+    description: "Click to generate a Resume."
+  },
+  {
+    name: "Podcast Generation",
+    link: "/podcast-agent",
+    description: "Click to generate a Podcast."
   }
 ]
 

@@ -63,13 +63,13 @@ const Me = () => {
 
             <div className='flex flex-col space-y-4'>
                 <h1 className='flex flex-start text-3xl font-bold '>Services</h1>
-                <div className=' grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
+                <div className=' grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8'>
                     {
                        services.map((service, index) => (
-                            <div key={index} className=' bg-card rounded-lg shadow-lg p-4 hover:shadow-xl hover:border transition-shadow duration-500 cursor-pointer'>
+                            <div key={index} className=' bg-card rounded-lg shadow-lg p-4  hover:border  cursor-pointer'>
                                 <Link href={service.link} className='w-full h-full flex flex-col items-center justify-center'>
                                 <h2 className='text-foreground text-xl font-semibold'>{service.name}</h2>
-                                <p className='text-primary text-sm mt-2'>Click to {service.link.includes('generate-grant') ? 'generate a grant proposal' : service.link.includes('search-grant') ? 'search for grants' : 'generate a resume'}</p>
+                                <p className='text-primary text-sm mt-2'>{service.description}</p>
                                 </Link>
                             </div>
                         )) 

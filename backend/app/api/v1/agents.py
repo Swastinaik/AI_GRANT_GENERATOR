@@ -4,7 +4,7 @@ import shutil
 import traceback
 import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Response,  BackgroundTasks,Body, Request, UploadFile, Form
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from app.schemas import user
 from app.services.grant_agent.summarize_documents import summarize_company_profile
@@ -15,7 +15,8 @@ from app.services.grant_agent import generate_pdf
 from app.ai_agents.generate_grant import GrantGeneration
 from app.ai_agents.search_grant import SearchGrants
 from app.ai_agents.resume_agent import ResumeAgent
-from app.schemas.agents import SearchGrantInput
+from app.services.podcast_agent.nodes import generate_podcast_script, build_tts_chunk_stream, create_wav_header, stream_generator_wrapper
+from app.schemas.agents import SearchGrantInput, PodcastRequest
 from app.core.deps import check_usage, update_usage
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -125,4 +126,26 @@ async def generate_resume(background_tasks: BackgroundTasks,
     )
     return response
 
-  
+
+
+@router.post("/generate-podcast")
+async def generate_podcast_script_endpoint(request: PodcastRequest,
+                                        usage: dict = Depends(check_usage)):
+    try:
+        user_input = request.user_input
+        if not user_input:
+            raise HTTPException(status_code=400, detail="User input is required for podcast script generation.")
+        
+        # Generate the podcast script
+        podcast_script = generate_podcast_script(user_input)
+        await update_usage(usage)
+
+        return StreamingResponse(
+            stream_generator_wrapper(podcast_script),
+            media_type="audio/wav",
+        )
+    
+    except Exception as e:
+        print("Error generating podcast script:", e)
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred while generating the podcast script.")

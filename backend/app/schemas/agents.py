@@ -12,3 +12,7 @@ class SectionContent(BaseModel):
 class SearchGrantInput(BaseModel):
     keyword: str
     description: str
+
+
+class PodcastRequest(BaseModel):
+    user_input: str

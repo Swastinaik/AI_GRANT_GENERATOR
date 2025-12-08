@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     ALGORITHM: str = "HS256"
     GOOGLE_API_KEY: str
+    GEMINI_API_KEY: str
 
     class Config:
         env_file = ".env"
