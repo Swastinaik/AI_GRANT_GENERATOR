@@ -14,7 +14,8 @@ export async function proxy(request: NextRequest) {
     '/me',
     '/generate-grant',
     '/search-grant',
-    '/resume-generate'
+    '/resume-generate',
+    '/podcast-agent'
   ]
 
   const pathname = request.nextUrl.pathname
