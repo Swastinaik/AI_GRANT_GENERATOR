@@ -4,7 +4,8 @@ from datetime import timedelta
 import app.core.security as security
 from app.models.users import User
 from app.utils.users import get_user
-from app.db.client import client
+from app.db.client import db
+from app.services.history.history import get_user_history
 from app.core.deps import check_usage, get_current_user
 
 
@@ -17,6 +18,8 @@ async def read_users_me(current_user: User = Depends(get_current_user), usage = 
     """
     Get the current authenticated user.
     """
+    print("current ",current_user)
+    print("usage ",usage)
     if not current_user or not usage:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -24,6 +27,17 @@ async def read_users_me(current_user: User = Depends(get_current_user), usage = 
         )
     
     return {"user": current_user, "usage": usage}
+
+@router.get("/history")
+async def get_user_history_route(current_user: User = Depends(get_current_user)):
+    try:
+        res = await get_user_history(user_id=current_user["id"])
+        return res
+    except Exception as e:
+        print("Eror occured during getting history ",e)
+        raise Exception
+
+
 
     
     

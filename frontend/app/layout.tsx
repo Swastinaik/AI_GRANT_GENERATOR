@@ -1,8 +1,12 @@
-
+"use client"
 import { Roboto } from "next/font/google"
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { Toaster } from "@/components/ui/sonner"
+import NavBar from "@/components/NavBar";
+import { usePathname } from "next/navigation";
+import path from "path";
+
  const roboto = Roboto({
   weight: ["400", "500", "700"], // You can add '100', '300', '900' etc.
   subsets: ["latin"],
@@ -14,6 +18,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname()
+  const landingpage = pathname.startsWith('/landing-pages')
+  const loginPage = pathname.startsWith('/login')
+  const registerPage = pathname.startsWith('/register')
+
   
  
   return (
@@ -28,6 +37,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            {!landingpage && !loginPage && !registerPage && <NavBar />}
           {children}
           <Toaster />
           </ThemeProvider>

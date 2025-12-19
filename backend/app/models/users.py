@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 class User(BaseModel):
+    id: str | None = None
     username: str
     email: str
     isAdmin: bool = False

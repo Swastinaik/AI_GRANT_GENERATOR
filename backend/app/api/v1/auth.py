@@ -36,8 +36,8 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     # create access token and refresh token (with jti)
-    access = security.create_access_token(subject=user["_id"])
-    refresh_token = security.create_refresh_token(subject=user["_id"])
+    access = security.create_access_token(subject=user["id"])
+    refresh_token = security.create_refresh_token(subject=user["id"])
     # set refresh token cookie (HttpOnly, Secure)
     response.set_cookie(
         key="refresh_token",

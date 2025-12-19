@@ -14,21 +14,23 @@ async def create_user(username: str, email: str, password: str) -> dict:
     user = UserInDB(**doc)
     res = await db.users.insert_one(user.model_dump())
     created = await db.users.find_one({"_id": res.inserted_id})
-    created["_id"] = str(created["_id"])
+    created["id"] = str(created["_id"])
     return created
 
 async def get_user_by_email(email: str) -> dict | None:
     u = await db.users.find_one({"email": email})
     if not u:
         return None
-    u["_id"] = str(u["_id"])
+    u["id"] = str(u["_id"])
+    del u['_id']
     return u
 
 async def get_user_by_id(user_id: str) -> dict | None:
     u = await db.users.find_one({"_id": ObjectId(user_id)})
     if not u:
         return None
-    u["_id"] = str(u["_id"])
+    u["id"] = str(u["_id"])
+    del u['_id']
     return u
 
 async def verify_user_credentials(email: str, password: str) -> dict | None:
@@ -37,7 +39,8 @@ async def verify_user_credentials(email: str, password: str) -> dict | None:
         return None
     if not verify_password(password, user["hashed_password"]):
         return None
-    user["_id"] = str(user["_id"])
+    user["id"] = str(user["_id"])
+    del user['_id']
     return user
 
 # Refresh token store (stores hashed jti + user_id + expiry) for revocation and rotation

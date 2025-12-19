@@ -39,8 +39,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     user = await crud_users.get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    
     user = User(**user)
-    user = user.model_dump()  # Convert to User model
+    
+    
+    user = user.model_dump(by_alias=True)
+     # Convert to User model
+    print(user)
     return user
 
 
@@ -69,14 +74,16 @@ async def check_usage(user: User = Depends(get_current_user)):
         updated_doc = await db.usage.find_one_and_update(
             {"email":email},
             {"$set":{"email":email, "count":0, "date":datetime.datetime.now()}})
-        updated_doc['_id'] = str(updated_doc['_id'])
+        updated_doc['id'] = str(updated_doc['_id'])
+
         return updated_doc
     # 2. Check the limit
     if users_usage["count"] >= 4: # Checking for >= 4 means the 5th use is forbidden
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usage limit exceeded (5 per day)")
 
     # 3. If passed the check, return the document for the update function
-    users_usage['_id'] = str(users_usage['_id'])  # Convert ObjectId to string for consistency
+    users_usage['id'] = str(users_usage['_id'])  # Convert ObjectId to string for consistency
+    del users_usage['_id']
     return users_usage
     
 
