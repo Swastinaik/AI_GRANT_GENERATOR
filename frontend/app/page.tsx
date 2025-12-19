@@ -1,13 +1,21 @@
 'use client'
-import NavBar from "../components/NavBar"
-import Hero from "@/components/HeroSection"
-import FeatureSection from "@/components/FeatureSection"
+import Hero from "@/components/Home/HeroSection"
+import AgentSuite from "@/components/Home/AgentSuit"
+import EcosystemFeature from "@/components/Home/EcoSystemFeature"
+import Pricing from "@/components/Home/Pricing"
+import Footer from "@/components/landing/Footer"
 const Main = () => {
     return(
       <main>
-            <NavBar />
+        {/* */}
+           
+            
             <Hero />
-            <FeatureSection />
+            <AgentSuite/>
+            <EcosystemFeature/>
+            <Pricing/>
+            <Footer/>
+            
         </main>
 
     )
