@@ -2,6 +2,9 @@
 
 .tiptap {
   outline: none;
+  min-height: 200px;
+  height: 100%;
+  padding: 1rem;
 }
 
 .tiptap :first-child {
