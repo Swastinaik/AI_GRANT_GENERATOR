@@ -19,3 +19,4 @@ python-docx
 pydantic[email]
 argon2_cffi
 google-genai
+weasyprint

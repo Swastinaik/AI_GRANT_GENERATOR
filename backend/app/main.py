@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from dotenv import load_dotenv
-from app.api.v1 import agents, auth, users
+from app.api.v1 import agents, auth, users, export
 
 
 load_dotenv()
@@ -41,3 +41,4 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(agents.router)
 app.include_router(users.router)
+app.include_router(export.router)
