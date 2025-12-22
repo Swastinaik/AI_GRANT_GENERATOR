@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Download } from "lucide-react";
 import HomeButton from "@/app/components/HomeButton";
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export default function PodcastPage() {
   const [userInput, setUserInput] = useState("");
