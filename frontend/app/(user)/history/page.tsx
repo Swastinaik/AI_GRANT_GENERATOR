@@ -61,7 +61,7 @@ export default function HistoryPage() {
 
                 {/* Header */}
                 <div className="flex items-center gap-4">
-                    <Link href="/dashboard" className="p-2 rounded-full hover:bg-secondary transition-colors">
+                    <Link href="/me" className="p-2 rounded-full hover:bg-secondary transition-colors">
                         <ArrowLeft className="w-5 h-5 text-muted-foreground" />
                     </Link>
                     <div>

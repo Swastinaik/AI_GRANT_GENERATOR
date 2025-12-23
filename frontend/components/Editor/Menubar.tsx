@@ -17,20 +17,51 @@ import {
   Minus,
   Type,
   Eraser,
+  FileText,
+  FileDown,
+  Download
 } from 'lucide-react';
 import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
 import { Button } from '../ui/button';
 import type { Editor } from '@tiptap/react'
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
-import { HeadingDropdown} from './HeaderDropdown'
+import { HeadingDropdown } from './HeaderDropdown'
+import axios from 'axios';
+
 
 interface HeadingProps {
   editor: Editor;
 }
 
 export function MenuBar({ editor }: { editor: Editor }) {
-  
+
+ const handleSubmit = async () => {
+  const html = editor.getHTML()
+  try {
+    const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'api'
+    console.log(`${BASE_URL}/export/pdf`)
+    const response = await axios.post(`${BASE_URL}/export/pdf`,{html:html}, {
+      responseType: 'blob',
+      headers: {
+        'Accept':'application/pdf'
+      }
+    })
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    // 2. Create a hidden anchor element to trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    const fileName = `Pdf_${Date.now()}.pdf`
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    
+  }
+ }
   const editorState = useEditorState({
     editor,
     selector: ctx => {
@@ -174,7 +205,13 @@ export function MenuBar({ editor }: { editor: Editor }) {
       >
         <Eraser className="h-4 w-4" />
       </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => handleSubmit()}
+      >
+        <Download className="h-4 w-4" />
+      </Button>
     </div>
-
   )
 }

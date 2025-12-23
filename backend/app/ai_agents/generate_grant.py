@@ -5,6 +5,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import JsonOutputParser
 from langgraph.graph import StateGraph, START, END
+from langchain_groq import ChatGroq
 import os
 import asyncio
 import operator
@@ -29,9 +30,11 @@ class additional_section_parser(TypedDict):
     title: str
     content: str
 #llm definition
-os.environ["GOOGLE_API_KEY"]=os.getenv("GOOGLE_API_KEY")
-llm=ChatGoogleGenerativeAI(model='gemini-2.0-flash')
+os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
 
+llm = ChatGroq(
+    model="openai/gpt-oss-20b"
+)
 #base_prompt = BASE_PROMPT = 
 
 #Nodes
@@ -42,10 +45,11 @@ class GrantGeneration:
         self.organizations_detail: Dict[str, Any] = organizations_detail
         self.language = user_input['language']
         self.base_prompt= f"""
+            Important Note: please restrict and complete it within 150 words and its mandatory.
             You are a professional grant writer.
             You are writing a grant proposal for a non-profit organization.
-            always add the "\n" at the end of the sentence.
-            if there is a line break needed add "\n" at the end of the sentence.
+            always add the <br> html tag at the end of the sentence or break point.
+            if there is a line break needed add <br> at the end of the sentence.
             Always generate this whole section in this language: {self.language} mandatory
         """
         self.grants: Dict[str, Any]= {}
@@ -61,11 +65,11 @@ class GrantGeneration:
         self.workflow.add_node('sustainibility_plan',self.sustainibility_plan)
         self.workflow.add_node('aggregate',self.aggregate_sections_node)
         self.workflow.add_node('additional_section', self.additional_section)
-        self.workflow.add_node('sender_and_reciever',self.sender_and_reciever)
+        
         self.entry_points = [
                                 "cover_letter", "executive_summary", "statement_of_need",
                                 "project_description", "organization_background", "evaluation_plan",
-                                "budget_section", "sustainibility_plan", "additional_section","sender_and_reciever"
+                                "budget_section", "sustainibility_plan", "additional_section"
                             ]
         self.add_entry_points_to_workflow()
         self.add_node_to_aggregate()
@@ -139,6 +143,7 @@ class GrantGeneration:
                 ("human", """
                     {base_prompt}
                  Please generate the executive summary using the following details:
+                 
                  <Problem_and_Solution>
                  Project Title: {project_title}
                  The core problem we are solving: {statement_of_need}
@@ -409,6 +414,32 @@ class GrantGeneration:
                  <Justification_Context>
                  Explain why these budget items are necessary to achieve the goals outlined in the project plan: {project_description}
                  </Justification_Context>
+                 <Output format>
+                 Example:
+                    <table>
+                        <th>
+                            <th>Item</th>
+                            <th>Amount</th>
+                            <th>Justification</th>
+                        </th>
+                        <tr>
+                            <td>Item 1</td>
+                            <td>Amount 1</td>
+                            <td>Justification 1</td>
+                        </tr>
+                        <tr>
+                            <td>Item 2</td>
+                            <td>Amount 2</td>
+                            <td>Justification 2</td>
+                        </tr>
+                        <tr>
+                            <td>Item 3</td>
+                            <td>Amount 3</td>
+                            <td>Justification 3</td>
+                        </tr>
+                        
+                    </table>
+                 </Output format>
                  """)
             ])
             output_parser=StrOutputParser()
@@ -500,41 +531,8 @@ class GrantGeneration:
             raise ValueError(f"Failed to generate additional section: {e}")
     
     
-    async def sender_and_reciever(self,state: GraphState):
-        user_input = state.get('user_input',{})
-        organizations_detail = state.get('organizations_detail',{})
-        profile_summary = organizations_detail.get('profile_summary',{})
-        funders_detail = user_input.get('funders_detail',{})
-        output_parser = StrOutputParser()
-        senders_name = None
-        funders_name = None
-        try:
-            prompt = ChatPromptTemplate([
-                ("system","You are expert in understanding and extracting organizations name from provided text as profile summary you just need to output the name of the organizations."),
-                ("human","This is the <profile summary> {profile_summary} </profile_summary> extract only name give it as output.")
-            ])
-            chain = prompt | llm | output_parser
-            senders_name_from_chain = await chain.ainvoke({'profile_summary':profile_summary})
-            senders_name = senders_name_from_chain
-        except Exception as e:
-            raise f"Error while generating the senders name"
-        try:
-            prompt = ChatPromptTemplate([
-                ("system","You are expert in understanding and extracting organizations name from provided text as funders detail you just need to output the name of the funder."),
-                ("human","This is the <funders_detail> {funders_detail} </funders_detail> extract only name give it as output.")
-            ])
-            chain = prompt | llm | output_parser
-            funders_name_from_chain = await chain.ainvoke({'funders_detail':funders_detail})
-            funders_name = funders_name_from_chain
-            grants = state.get("grants",{}).copy()
-            grants['Funders Name'] = funders_name
-        except Exception as e:
-            raise f"Error while generating the senders name"
-        grants = state.get("grants",{}).copy()
-        grants['Funders Name'] = funders_name
-        grants['Senders Name'] = senders_name
-
-        return {'grants': grants}
+    
+       
 
 
     def aggregate_sections_node(self,state: GraphState):
@@ -546,7 +544,7 @@ class GrantGeneration:
         sequence = [
             "Cover Letter", "Executive Summary", "Statement Of Need",
             "Project Description", "Organization Background", "Evaluation Plan",
-            "Budget Section", "Sustainibility Plan",new_section,"Funders Name","Senders Name","Project Title"
+            "Budget Section", "Sustainibility Plan",new_section,"Project Title"
         ]
         new_grant = rearrange_dict(grant_sections, sequence)
         

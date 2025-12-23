@@ -6,15 +6,15 @@ from pydantic import BaseModel, Field
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
 load_dotenv()
 
-google_api_key = os.getenv('GOOGLE_API_KEY')
+os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
-    temperature=0
+llm = ChatGroq(
+    model="openai/gpt-oss-20b"
 )
 
 class CompanyProfileDetails(BaseModel):
@@ -54,12 +54,12 @@ prompt = PromptTemplate(
 )
 
 
-def summarize_company_profile(company_text: str) -> CompanyProfileDetails:
+async def summarize_company_profile(company_text: str) -> CompanyProfileDetails:
     chain = prompt | llm | parser
     try:
         
         # Invoke the chain with the provided company text
-        structured_company_data: CompanyProfileDetails = chain.invoke({"company_text": company_text, "format_instructions": parser.get_format_instructions()})
+        structured_company_data: CompanyProfileDetails = await chain.ainvoke({"company_text": company_text, "format_instructions": parser.get_format_instructions()})
         print("Raw LLM Output:", structured_company_data.model_dump_json(indent=4))
         dict_data = structured_company_data.model_dump()
         return dict_data

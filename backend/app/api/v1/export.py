@@ -21,19 +21,21 @@ async def export_pdf(data: dict):
 
     # 2. Build the HTML Wrapper
     # Note: We do NOT link the CSS here. We inject it via Python later.
-    full_html = f"""
+    template = """
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="utf-8">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     </head>
-    <body>
+    <body style="font-family: 'Roboto', sans-serif;">
         <div class="tiptap">
-            {html_content}
+            {{CONTENT}}
         </div>
     </body>
     </html>
     """
+    full_html = template.replace("{{CONTENT}}", html_content)
 
     # 3. Generate PDF with the external CSS
     # base_url is required if your CSS references images/fonts via relative paths

@@ -31,11 +31,14 @@ async def read_users_me(current_user: User = Depends(get_current_user), usage = 
 @router.get("/history")
 async def get_user_history_route(current_user: User = Depends(get_current_user)):
     try:
-        res = await get_user_history(user_id=current_user["id"])
+        res = await get_user_history(user_email=current_user["email"])
         return res
     except Exception as e:
-        print("Eror occured during getting history ",e)
-        raise Exception
+        print("Error occurred during getting history:", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred while fetching history: {str(e)}"
+        )
 
 
 
