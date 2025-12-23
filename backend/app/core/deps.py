@@ -60,6 +60,8 @@ async def check_usage(user: User = Depends(get_current_user)):
         "email": email,
     })
 
+    
+
     if not users_usage:
         # First use today, create a new record with count 0 (to be incremented later)
         new_usage_dict = {
@@ -69,6 +71,9 @@ async def check_usage(user: User = Depends(get_current_user)):
         }
         await db.usage.insert_one(new_usage_dict)
         return new_usage_dict # Count is 0
+    
+    if user["isAdmin"] == True:
+        return users_usage
 
     if users_usage['date'] < today_midnight:
         updated_doc = await db.usage.find_one_and_update(
@@ -78,8 +83,8 @@ async def check_usage(user: User = Depends(get_current_user)):
 
         return updated_doc
     # 2. Check the limit
-    if users_usage["count"] >= 4: # Checking for >= 4 means the 5th use is forbidden
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usage limit exceeded (5 per day)")
+    if users_usage["count"] >= 5: # Checking for >= 4 means the 5th use is forbidden
+        return users_usage
 
     # 3. If passed the check, return the document for the update function
     users_usage['id'] = str(users_usage['_id'])  # Convert ObjectId to string for consistency

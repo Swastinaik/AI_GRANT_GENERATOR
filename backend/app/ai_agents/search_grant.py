@@ -7,13 +7,18 @@ import os
 import httpx
 from langchain_google_genai import GoogleGenerativeAI
 from dotenv import load_dotenv
+from langchain_groq import ChatGroq
 load_dotenv()
-os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
+
 class GrantState(TypedDict):
     keyword: str
     description: str
     grants: List[Dict[str, any]]  # List of grant dicts
-llm = GoogleGenerativeAI(model="gemini-2.0-flash")
+os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
+
+llm = ChatGroq(
+    model="openai/gpt-oss-20b"
+)
 
 class SearchGrants:
     """This class contains the nodes for searching and scoring grants."""
@@ -43,7 +48,8 @@ class SearchGrants:
         if response.status_code != 200:
             raise ValueError("API request failed")
 
-        data = response.json()  # Assuming JSON response
+        data = response.json() 
+        print("Data from grant api", data) # Assuming JSON response
         grants = []
         grants_from_api=data["data"]["oppHits"]
         print("aPi accessd successfully")
@@ -59,7 +65,7 @@ class SearchGrants:
                 "link": f'https://grants.gov/search-results-detail/{id_}'
             }
             grants.append(grant)
-        print("Generated grants for state")
+        print("Generated grants for state",grants)
         return {"grants": grants}
 
       # Or your preferred LLM
@@ -85,14 +91,15 @@ class SearchGrants:
             truncated_synopsis = ' '.join(words[:150]) or "No description available, give a valid score"
             prompt = PromptTemplate(
                 input_variables=["description", "synopsis"],
-                template="Score relevance of this grant synopsis to the project description from 1 to 100. Be blunt and honest; if found something incorrect, don't hesitate to reduce score; remain neutral.\nProject: {description}\nSynopsis: {synopsis}\nOutput only the score as an integer."
+                template="Score relevance of this grant synopsis to the project description from 1 to 100. remain neutral and give fairly.\nProject: {description}\nSynopsis: {synopsis}\nOutput only the score as an integer."
             )
             chain = prompt | llm
             score_str = await chain.ainvoke({"description": user_description, "synopsis": truncated_synopsis})
             print("Schema for score:", score_str)
             try:
-                grant["score"] = int(score_str.strip())  # Parse score with error handling
-            except ValueError:
+                # Access .content as score_str is an AIMessage object
+                grant["score"] = int(score_str.content.strip())
+            except (ValueError, AttributeError):
                 print(f"Invalid score from LLM for grant {grant['id']}: {score_str}")
                 grant["score"] = 0
         await asyncio.gather(*[process_grant(grant) for grant in grants])

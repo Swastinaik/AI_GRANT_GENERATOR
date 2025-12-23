@@ -2,13 +2,14 @@ from app.db.client import db
 from datetime import datetime
 from app.models.history import History
 
-async def create_user_history(user_id: str,
+async def create_user_history(user_email: str,
                         agent_name: str,
                         description: str| None):
     try:
         time = datetime.now()
+
         doc = {
-            "user_id": user_id,
+            "user_email": user_email,
             "agent_name": agent_name,
             "description": description,
             "time":time ,
@@ -18,10 +19,10 @@ async def create_user_history(user_id: str,
         return str(res.inserted_id)
     except Exception as e:
         print(f"Failed to create history: {e}")
-        raise Exception
+        raise e
 
 async def get_user_history(
-        user_id: str,
+        user_email: str,
         skip: int = 0,
         limit: int = 100,
         sort_by: str = "time",
@@ -29,7 +30,7 @@ async def get_user_history(
 ):
     try:
         documents = []
-        cursor = await db.history.find({"user_id": user_id})
+        cursor = db.history.find({"user_email": user_email})
         cursor = cursor.sort(sort_by, sort_order).skip(skip).limit(limit)
         async for doc in cursor:
             doc["_id"] = str(doc["_id"])
@@ -37,6 +38,6 @@ async def get_user_history(
         return documents
     except Exception as e:
         print(f"Failed to get history: {e}")
-        raise Exception
+        raise e
 
 

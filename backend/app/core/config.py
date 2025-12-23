@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     ALGORITHM: str = "HS256"
+    GROQ_API_KEY: str
     GOOGLE_API_KEY: str
     GEMINI_API_KEY: str
 

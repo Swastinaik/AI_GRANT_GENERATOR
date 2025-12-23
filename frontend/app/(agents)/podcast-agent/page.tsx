@@ -7,6 +7,9 @@ import BackButton from "@/app/components/BackButton";
 import { Label } from "@/components/ui/label";
 import { Loader2, Download } from "lucide-react";
 import HomeButton from "@/app/components/HomeButton";
+import useAuthStore from "@/app/store/AuthStore";
+import { fetchWithAuth } from "@/app/lib/api";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -15,6 +18,8 @@ export default function PodcastPage() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { accessToken, setAccessToken } = useAuthStore();
 
   // Clean up old blob URLs
   useEffect(() => {
@@ -40,13 +45,18 @@ export default function PodcastPage() {
         setAudioUrl(null);
       }
 
-      const response = await fetch(`${API_BASE_URL}/generate-podcast`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetchWithAuth(
+        `${API_BASE_URL}/generate-podcast`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ user_input: userInput }),
         },
-        body: JSON.stringify({ user_input: userInput }),
-      });
+        accessToken,
+        setAccessToken
+      );
 
       if (!response.ok || !response.body) {
         throw new Error(`Request failed with status ${response.status}`);
@@ -100,9 +110,9 @@ export default function PodcastPage() {
 
       {/* Main content */}
       <main className="flex-1">
-        
+
         <div className="mx-auto max-w-5xl px-4 py-8 space-y-8">
-          
+
           {/* Input section */}
           <section className="space-y-4">
             <div className="space-y-2">

@@ -31,6 +31,8 @@ router = APIRouter(tags=["agents"])
 @router.post("/generate-grant")
 async def chat(backgroundtaks: BackgroundTasks, file: UploadFile, user_input: str = Form(...), usage: dict = Depends(check_usage)):
     user_input = json.loads(user_input)
+    if usage["count"] >= 5:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usage limit exceeded (5 per day)")
     try:
         file_location = os.path.join(UPLOAD_DIRECTORY, file.filename)
         with open(file_location, "wb+") as file_object:
@@ -38,14 +40,14 @@ async def chat(backgroundtaks: BackgroundTasks, file: UploadFile, user_input: st
         absolute_file_path = os.path.abspath(file_location)
         loader = generate_loader(absolute_file_path)
         company_text = convert_docs_to_text(loader)
-        organizations_detail = summarize_company_profile(company_text)
+        organizations_detail = await summarize_company_profile(company_text)
         
         # Generate the grant proposal using the chat service
         generate_grant= GrantGeneration(user_input=user_input,organizations_detail=organizations_detail)
         grant_proposal=await generate_grant.run_graph()
         
         await update_usage(usage)
-        await create_user_history(user_id=usage['_id'],agent_name="Grant Writer", description="Project Title")
+        await create_user_history(user_email=usage["email"],agent_name="Grant Writer", description="Project Title")
         backgroundtaks.add_task(delete_file, absolute_file_path)
         return grant_proposal
         
@@ -57,6 +59,7 @@ async def chat(backgroundtaks: BackgroundTasks, file: UploadFile, user_input: st
 
 @router.post("/generate-pdf/{style}")
 def generate_pdf_for_request(background_tasks: BackgroundTasks, style: str, grant_proposal: str = Form(...)):
+    
     try:
         grant_proposal = json.loads(grant_proposal)
         print("grant_proposal in generate_pdf ", grant_proposal['downloadResponse'])
@@ -79,12 +82,14 @@ def generate_pdf_for_request(background_tasks: BackgroundTasks, style: str, gran
 
 @router.post('/search-grant')
 async def search_grants(user_input: SearchGrantInput=Body(...), usage: dict = Depends(check_usage)):
+    if usage["count"] >= 5:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usage limit exceeded (5 per day)")
     try:
         search_grant=SearchGrants(user_input.keyword,user_input.description)
         result= await search_grant.invoke_graph()
        
         await update_usage(usage)
-        await create_user_history(user_id=usage['_id'], agent_name="Search Grant", description=user_input.description)
+        await create_user_history(user_email=usage["email"], agent_name="Search Grant", description=user_input.description)
         return result
     except json.JSONDecodeError:  # If you still need manual parsing elsewhere
         raise HTTPException(status_code=400, detail="Invalid JSON input")
@@ -101,7 +106,9 @@ async def generate_resume(background_tasks: BackgroundTasks,
                     user_information: str = Form(None),
                     file: UploadFile | None = None
                     ,usage: dict = Depends(check_usage)):
- 
+    if usage["count"] >= 5:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usage limit exceeded (5 per day)")
+
     job_description = job_description
     style = style
     agent = None
@@ -114,14 +121,14 @@ async def generate_resume(background_tasks: BackgroundTasks,
     else:
         user_input = user_information
         agent = ResumeAgent(job_description=job_description,user_input = user_input, style=style)
-    output_file_path = agent.run_graph()
+    output_file_path = await agent.run_graph()
     if file_location and os.path.exists(file_location):
         os.remove(file_location)
     file_name = os.path.basename(output_file_path)
     background_tasks.add_task(delete_file, output_file_path)
     
     await update_usage(usage)
-    await create_user_history(user_id=usage['_id'], agent_name="Resume Agent", description=job_description)
+    await create_user_history(user_email=usage["email"], agent_name="Resume Agent", description=job_description)
     response = FileResponse(
         path=output_file_path,
         filename=file_name,
@@ -134,6 +141,8 @@ async def generate_resume(background_tasks: BackgroundTasks,
 @router.post("/generate-podcast")
 async def generate_podcast_script_endpoint(request: PodcastRequest,
                                         usage: dict = Depends(check_usage)):
+    if usage["count"] >= 5:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usage limit exceeded (5 per day)")
     try:
         user_input = request.user_input
         if not user_input:
@@ -142,7 +151,7 @@ async def generate_podcast_script_endpoint(request: PodcastRequest,
         # Generate the podcast script
         podcast_script = generate_podcast_script(user_input)
         await update_usage(usage)
-        await create_user_history(user_id=usage["_id"], agent_name="Podcast Agent", description=user_input)
+        await create_user_history(user_email=usage["email"], agent_name="Podcast Agent", description=user_input)
 
         return StreamingResponse(
             stream_generator_wrapper(podcast_script),

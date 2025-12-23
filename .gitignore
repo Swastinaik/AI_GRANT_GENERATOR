@@ -2,3 +2,15 @@
 env*
 venv
 .vscode
+__pycache__/
+*.py[cod]
+*$py.class
+node_modules/
+.next/
+out/
+build/
+.vercel
+.DS_Store
+*.log
+tmp/
+uploaded_file/

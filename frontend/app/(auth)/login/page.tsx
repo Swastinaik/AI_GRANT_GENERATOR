@@ -1,5 +1,5 @@
 "use client"
-import React ,{use, useState} from 'react'
+import React, { use, useState } from 'react'
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
@@ -42,20 +42,20 @@ const formSchema = z.object({
 })
 
 export default function ProfileForm() {
-  const setAccessToken = useAuthStore((state)=>state.setAccessToken)
+  const setAccessToken = useAuthStore((state) => state.setAccessToken)
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  
-    const form = useForm<z.infer<typeof formSchema>>({
+
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   })
-  
-  function displayToast(errorMEssage: string){
+
+  function displayToast(errorMEssage: string) {
     toast.error(errorMEssage)
   }
   // 2. Define a submit handler.
@@ -69,7 +69,7 @@ export default function ProfileForm() {
         method: 'POST',
         body: formData,
         credentials: 'include',
-        })
+      })
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Login failed');
@@ -82,78 +82,79 @@ export default function ProfileForm() {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       displayToast(errorMessage);
     }
-    finally{
+    finally {
       setIsLoading(false);
     }
-   
-    
+
+
   }
- 
+
   return (
     <div className='min-h-screen flex justify-center items-center'>
-    <BackgroundGradient className='w-96 sm:max-w-md"'>
-    <Card className="w-full sm:max-w-md">
-      <h2 className='text-2xl text-center font-semibold'>Sign In</h2>
-      <CardContent>
-        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-             <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">
-                    Email
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="email"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Enter your email"
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
+      <BackgroundGradient className='w-96 sm:max-w-md"'>
+        <Card className="w-full sm:max-w-md">
+          <h2 className='text-2xl text-center font-semibold'>Sign In</h2>
+          <CardContent>
+            <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+              <FieldGroup>
+                <Controller
+                  name="email"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="email">
+                        Email
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="email"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Enter your email"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">
-                    Password
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="password"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Enter your password"
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
+                />
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="password">
+                        Password
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="password"
+                        type='password'
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Enter your password"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
                   )}
-                </Field>
-              )}
-            />
-            </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter className='flex items-center justify-center'>
-       
-          <Button type="submit" form="form-rhf-demo" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Signing In...' : 'Sign In'}
-          </Button>
-   
-      </CardFooter>
-       <CardDescription className='text-center'>
-          Already have an account? <Link href="/register" className='text-blue-500 hover:underline'>Sign Up</Link>
-        </CardDescription>
-    </Card>
-    </BackgroundGradient>
+                />
+              </FieldGroup>
+            </form>
+          </CardContent>
+          <CardFooter className='flex items-center justify-center'>
+
+            <Button type="submit" form="form-rhf-demo" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Signing In...' : 'Sign In'}
+            </Button>
+
+          </CardFooter>
+          <CardDescription className='text-center'>
+            Already have an account? <Link href="/register" className='text-blue-500 hover:underline'>Sign Up</Link>
+          </CardDescription>
+        </Card>
+      </BackgroundGradient>
     </div>
   )
 }

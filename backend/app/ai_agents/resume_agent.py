@@ -3,7 +3,8 @@ from typing_extensions import TypedDict
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
-
+from langchain_groq import ChatGroq
+from langchain_core.output_parsers import PydanticOutputParser
 from langgraph.graph import StateGraph
 from app.utils.document_uploader import generate_loader, convert_docs_to_text
 
@@ -16,8 +17,11 @@ from app.services.resume_agent.test_parsing import generate_resume_docx
 load_dotenv()
 UPLOAD_DIRECTORY = "uploaded_file"
 
-os.environ["GOOGLE_API_KEY"]=os.getenv("GOOGLE_API_KEY")
-llm=ChatGoogleGenerativeAI(model='gemini-2.0-flash')
+os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
+
+llm = ChatGroq(
+    model="openai/gpt-oss-20b"
+)
 
 
 
@@ -116,97 +120,46 @@ class ResumeAgent:
     
 
     #This node will generate the resume data from jd and user_input
-    def generate_resume_data(self, state: ResumeState):
-        user_input = state['user_input']
-        print("user input     \n",user_input)
-        job_description = state['user_input']
+    async def generate_resume_data(self, state: ResumeState):
+        user_input = state.get('user_input', "")
+        job_description = state.get('job_description', "")
+        
+        print("Processing Resume Data Generation...")
+        parser  = PydanticOutputParser(pydantic_object=ResumeData)
+        # Specify method="json_mode" or "function_calling" for better reliability with Groq/Specialized models
         llm_with_structure = llm.with_structured_output(ResumeData)
+        
         try:
             prompt = ChatPromptTemplate([
-                ("system","You are an expert resume generator you will be provided the user detail and job description, your job is to generate high ats score resume data against the job description"),
-                ("human","""
-                    You are an expert resume writer and HR automation assistant specialized in creating ATS-optimized resumes.
-                    Your goal is to analyze the user's professional details and the target job description to generate a structured resume data object suitable for automatic document generation.
-
-                    Make sure the output is:
-                    - **Highly relevant to the job description** (use matching keywords naturally)
-                    - **Tailored for high ATS compatibility**
-                    - **Written in concise, professional English**
-                    - **Compliant with the exact output schema below**
-
-                    ---
+                ("system", "You are an expert resume generator. Your job is to generate a high-ATS score resume data object tailored to the job description provided."),
+                ("human", """
+                    Analyze the user's professional details and the target job description to generate a structured resume.
 
                     ### Job Description
-                    <job_description>
                     {job_description}
-                    </job_description>
 
                     ### User Professional Details
-                    <user_detail>
                     {user_input}
-                    </user_detail>
-
-                    ---
-
-                    ### Output Format
-                    Generate a valid JSON object matching this schema exactly:
-
-                    ---
-                      "name": "Full name of the candidate" if available,
-                      "title": "Professional title or role",
-                      "summary": "Brief professional summary highlighting relevant strengths and alignment with the job role",
-                      "contact": ["Email", "Phone", "LinkedIn URL (if provided)"],
-                      "skills": ["List of key technical and soft skills relevant to the job"],
-                      "experience": [
-                        -
-                          "title": "Job Title",
-                          "company": "Company Name",
-                          "duration": "Start - End Date or Years",
-                          "description": "Detailed but concise summary of key achievements and responsibilities using action verbs"
-                        -
-                      ],
-                      "education": [
-                        -
-                          "degree": "Degree Name",
-                          "institution": "University or College Name",
-                          "year": "Graduation Year"
-                        -
-                      ],
-                      "projects": [
-                        -
-                          "name": "Project Name",
-                          "description": "Brief summary focusing on impact, technologies used, and achievements"
-                        -
-                      ],
-                      "certifications": ["Relevant certifications or awards"]
-                    ---
-
-                    ---
 
                     ### Guidelines
-                    - Prioritize skills, tools, and experiences that **match or complement the job description**.
-                    - Rephrase user details into a **professional tone** with **quantifiable achievements** where possible.
-                    - If some fields are missing, leave them empty (`null` or `[]`), do **not hallucinate**.
-                    - Maintain consistent formatting and indentation for valid JSON.
-                    - Use **action verbs** and **measurable results** to improve ATS ranking.
-                    - Avoid repetition, filler words, and personal pronouns like “I” or “my”.
-
-                    Output **only** the final JSON structure — no explanation, no markdown, no additional text.
+                    - Prioritize keywords and experiences that match the job description naturally.
+                    - Use professional action verbs and quantifiable achievements.
+                    - If data for a field is missing, leave it as null or an empty list; do not hallucinate.
+                    - Maintain a professional tone and avoid personal pronouns.
                 """)
             ])
 
-            chain = prompt | llm_with_structure
-
-            resume_data = chain.invoke({
+            chain = prompt | llm | parser
+            
+            resume_data = await chain.ainvoke({
                 "job_description": job_description,
                 "user_input": user_input
             })
             
             return {"resume_data": resume_data}
 
-        
         except Exception as e:
-            raise ValueError(f"Failed to generate while generating resume data error: {e}")
+            raise ValueError(f"Failed to generate resume data: {e}")
     
     #This node is used for generating the resume docx
     def generate_docs(self, state: ResumeState):
@@ -218,7 +171,7 @@ class ResumeAgent:
         return {"output_path": output_path}
     
 
-    def run_graph(self):
+    async def run_graph(self):
         initial_input: ResumeState = {}
         initial_input["job_description"] = self.job_description
 
@@ -230,5 +183,5 @@ class ResumeAgent:
         if self.file_path is not None:
             initial_input["file_path"] = self.file_path
         print("initial input ",initial_input)
-        result = self.graph.invoke(initial_input)
+        result = await self.graph.ainvoke(initial_input)
         return result["output_path"]
