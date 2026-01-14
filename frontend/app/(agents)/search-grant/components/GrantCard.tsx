@@ -13,15 +13,18 @@ import {
 } from "@/components/ui/card"
 import { useRouter } from 'next/navigation'
 import {GrantType} from '../../../lib/utils/types'
+import  useAuthStore  from "@/app/store/AuthStore"
 interface GrantCardProps {
     grant: GrantType;
 }
 export default function GrantCard( grant :GrantCardProps) {
+  const setFundersDetail = useAuthStore((state)=> state.setFundersDetail)
   const {id,title,agency,agencyCode,openDate,closeDate,link,score} = grant.grant
-  const funders_detail={'id':id,'title':title,'agency':agency,'agencyCode':agencyCode,'openDate':openDate,'closeDate':closeDate,'link':link}
+  const fundersDetail = `The id of Organization is ${id} title ${title}, agency name is ${agency} with code ${agencyCode}, the opening date for the grant is ${openDate} and closing date is ${closeDate}`
   const router = useRouter()
   const handleGenerate = () => {
   try {
+    setFundersDetail(fundersDetail)
     router.push(`/generate-grant`)
   } catch (error) {
     console.log(error)
@@ -43,14 +46,14 @@ export default function GrantCard( grant :GrantCardProps) {
       </CardContent>
       {/* Buttons at the bottom-right corner */}
       <CardFooter className="flex justify-around items-center mt-6">
-        <Link href={link} target="_blank" rel="noopener noreferrer" className=" underline">
+        <a href={link} target="_blank" rel="noopener noreferrer" className=" underline">
         <Button
         variant={'outline'}
         >
           View Grant
           Apply
         </Button>
-        </Link>
+        </a>
         <Button
           onClick={handleGenerate}
         >

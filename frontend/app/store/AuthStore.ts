@@ -9,7 +9,7 @@ interface AuthState{
     templateStyle: string| null;
     selectTemplate:(style:string|null)=> void;
     fundersDetail?: string;
-    setfundersDetail: (detail: string) => void
+    setFundersDetail: (detail: string) => void
 }
 
 
@@ -27,7 +27,7 @@ const useAuthStore = create<AuthState>()(
             selectTemplate:(template)=>{
                 set({templateStyle: template})
             },
-            setfundersDetail: (detail) => {
+            setFundersDetail: (detail) => {
                 set({fundersDetail: detail})
             }
         }),
