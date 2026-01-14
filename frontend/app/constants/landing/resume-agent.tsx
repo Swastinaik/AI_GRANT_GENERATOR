@@ -18,11 +18,6 @@ export const benefits = [
     icon: <Zap className="w-6 h-6" />,
   },
   {
-    title: "One-Click Transformation",
-    description: "Upload a prior resume or fill in your profile — then select a job description and get a polished, targeted resume in minutes ready for download in PDF or DOCX.",
-    icon: <FileText className="w-6 h-6" />,
-  },
-  {
     title: "Role-Focused Scoring & Feedback",
     description: "Each generated resume receives an ATS compatibility score and clear suggestions (strengths, gaps, and recommended phrases) so you know exactly what to improve.",
     icon: <Award className="w-6 h-6" />,

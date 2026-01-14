@@ -3,9 +3,11 @@ import json
 import shutil
 import traceback
 import datetime
-from fastapi import APIRouter, Depends, HTTPException, status, Response,  BackgroundTasks,Body, Request, UploadFile, Form
+import uuid
+from fastapi import APIRouter, Depends, HTTPException, status, Response,  BackgroundTasks,Body, Request, UploadFile, Form, File
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.concurrency import run_in_threadpool
 from app.schemas import user
 from app.services.grant_agent.summarize_documents import summarize_company_profile
 from app.utils.background_tasks import delete_file
@@ -15,7 +17,7 @@ from app.services.grant_agent import generate_pdf
 from app.ai_agents.generate_grant import GrantGeneration
 from app.ai_agents.search_grant import SearchGrants
 from app.ai_agents.resume_agent import ResumeAgent
-from app.services.podcast_agent.nodes import generate_podcast_script, build_tts_chunk_stream, create_wav_header, stream_generator_wrapper
+from app.services.podcast_agent.nodes import generate_podcast_script, stream_generator_wrapper, generate_script_from_pdf
 from app.schemas.agents import SearchGrantInput, PodcastRequest
 from app.core.deps import check_usage, update_usage
 from app.services.history.history import create_user_history, get_user_history
@@ -26,6 +28,8 @@ os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 
 router = APIRouter(tags=["agents"])
+
+
 
 #Routes to handle chat functionality
 @router.post("/generate-grant")
@@ -139,19 +143,42 @@ async def generate_resume(background_tasks: BackgroundTasks,
 
 
 @router.post("/generate-podcast")
-async def generate_podcast_script_endpoint(request: PodcastRequest,
-                                        usage: dict = Depends(check_usage)):
+async def generate_podcast_script_endpoint(
+    background_tasks: BackgroundTasks,
+    user_input: str = Form(None),
+    file: UploadFile  = File(None),
+    usage: dict = Depends(check_usage)
+    ):
     if usage["count"] >= 5:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Usage limit exceeded (5 per day)")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Usage limit exceeded (5 per day)")
+    if not file and not user_input:
+        raise HTTPException(
+            status_code=400,
+            detail="Either a file or user_input must be provided."
+        )
+    file_temp_path = None
     try:
-        user_input = request.user_input
-        if not user_input:
-            raise HTTPException(status_code=400, detail="User input is required for podcast script generation.")
+        if file:
+            file_ext = os.path.splitext(file.filename)[1]
+            unique_filename = f"{uuid.uuid4()}{file_ext}"
+            file_temp_path = os.path.join(UPLOAD_DIRECTORY, unique_filename)
+            with open(file_temp_path, "wb+") as buffer:
+                await run_in_threadpool(shutil.copyfileobj, file.file, buffer)
+            background_tasks.add_task(delete_file, file_temp_path)
+            podcast_script = await generate_script_from_pdf(file_temp_path)
+        else:
+            podcast_script = await generate_podcast_script(user_input)
         
-        # Generate the podcast script
-        podcast_script = generate_podcast_script(user_input)
         await update_usage(usage)
-        await create_user_history(user_email=usage["email"], agent_name="Podcast Agent", description=user_input)
+
+        history_desc = user_input or f"File based podcast {file.filename}"
+        await create_user_history(
+            user_email=usage["email"], 
+            agent_name="Podcast Agent", 
+            description=history_desc
+        )
 
         return StreamingResponse(
             stream_generator_wrapper(podcast_script),
@@ -161,4 +188,8 @@ async def generate_podcast_script_endpoint(request: PodcastRequest,
     except Exception as e:
         print("Error generating podcast script:", e)
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail="An error occurred while generating the podcast script.")
+        if file_temp_path:
+            delete_file(file_temp_path)
+        raise HTTPException(
+            status_code=500, 
+            detail="An error occurred while generating the podcast script.")

@@ -49,6 +49,9 @@ export default function Resume() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        if(!accessToken){
+            return
+        }
         setLoading(true)
         try {
             const form = new FormData()

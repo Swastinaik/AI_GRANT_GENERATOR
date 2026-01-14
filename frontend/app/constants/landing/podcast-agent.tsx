@@ -24,12 +24,6 @@ export const benefits = [
       "Listen while it’s being generated. Podcasts are streamed in real time so users can start listening without waiting for the full audio.",
     icon: <PlayCircle className="w-6 h-6" />,
   },
-  {
-    title: "One-Click Download & Share",
-    description:
-      "Download the finished podcast as an MP3 file, ready to publish on Spotify, YouTube, Apple Podcasts, or share directly with your audience.",
-    icon: <Download className="w-6 h-6" />,
-  },
 ];
 
 export const testimonials = [

@@ -35,6 +35,9 @@ export default function HistoryPage() {
 
     useEffect(() => {
         const fetchHistory = async () => {
+            if(!accessToken){
+                return
+            }
             try {
                 setLoading(true);
                 // Using the endpoint you provided

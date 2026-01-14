@@ -15,4 +15,5 @@ class SearchGrantInput(BaseModel):
 
 
 class PodcastRequest(BaseModel):
-    user_input: str
+    user_input: str | None = None
+    

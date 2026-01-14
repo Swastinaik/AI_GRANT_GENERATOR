@@ -85,6 +85,9 @@ export default function MultiStepTemplateForm() {
   };
 
   const handleGenerate = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    if(!accessToken){
+      return
+    }
     e.preventDefault();
     setLoading(true)
     try {

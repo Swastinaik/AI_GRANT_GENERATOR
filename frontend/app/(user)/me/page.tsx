@@ -42,6 +42,9 @@ const Me = () => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
+                if(!accessToken){
+                    return
+                }
                 setLoading(true);
                 const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, { method: 'POST' }, accessToken, setAccessToken);
                 if (!response.ok) throw new Error('Failed to fetch user data');
@@ -63,7 +66,7 @@ const Me = () => {
             }
         }
         if (accessToken) fetchUserData();
-    }, [accessToken, setAccessToken]);
+    }, [accessToken]);
 
     // Loading Skeleton
     if (loading) {

@@ -24,6 +24,9 @@ export default function SearchGrantForm() {
   const handleSubmit = async () => {
    
     try {
+      if(!accessToken){
+        return
+      }
       setLoading(true)
       const api = process.env.NEXT_PUBLIC_API_URL || 'api'
       let user_input: any = {}

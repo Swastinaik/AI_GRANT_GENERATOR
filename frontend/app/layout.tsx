@@ -1,12 +1,9 @@
-"use client"
+
 import { Roboto } from "next/font/google"
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider"
-import { Toaster } from "@/components/ui/sonner"
-import NavBar from "@/components/NavBar";
-import { usePathname } from "next/navigation";
-import path from "path";
+import ClientLayout from "./client-layout"
+
 
 const roboto = Roboto({
   weight: ["400", "500", "700"], // You can add '100', '300', '900' etc.
@@ -25,7 +22,7 @@ export const metadata: Metadata = {
     title: "Docs4All",
     description:
       "An Unified Platform for AI Agents to get things done",
-    url: "https://ai-grant-generator.vercel.app/",
+    url:  new URL("https://ai-grant-generator.vercel.app"),
     siteName: "Docs4All",
     images: [
       {
@@ -52,10 +49,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname()
-  const landingpage = pathname.startsWith('/landing-pages')
-  const loginPage = pathname.startsWith('/login')
-  const registerPage = pathname.startsWith('/register')
+ 
 
 
 
@@ -63,18 +57,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
 
-        className={roboto.className}
+         className={`${roboto.variable} font-sans`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {!landingpage && !loginPage && !registerPage && <NavBar />}
+        <ClientLayout>
           {children}
-          <Toaster />
-        </ThemeProvider>
+        </ClientLayout>
+    
       </body>
     </html>
   );

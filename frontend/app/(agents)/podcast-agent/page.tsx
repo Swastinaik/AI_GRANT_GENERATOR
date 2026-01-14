@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Input } from '@/components/ui/input';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import BackButton from "@/app/components/BackButton";
 import { Label } from "@/components/ui/label";
 import { Loader2, Download } from "lucide-react";
-import HomeButton from "@/app/components/HomeButton";
 import useAuthStore from "@/app/store/AuthStore";
 import { fetchWithAuth } from "@/app/lib/api";
 
@@ -18,8 +18,17 @@ export default function PodcastPage() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null)
+  const accessToken = useAuthStore((state) => state.accessToken)
+  const setAccessToken = useAuthStore((state) => state.setAccessToken)
 
-  const { accessToken, setAccessToken } = useAuthStore();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files[0]) {
+      setFile(files[0])
+    }
+  };
 
   // Clean up old blob URLs
   useEffect(() => {
@@ -29,13 +38,14 @@ export default function PodcastPage() {
   }, [audioUrl]);
 
   const handleGenerate = async () => {
-    setError(null);
-
-    if (!userInput.trim()) {
-      setError("Please enter a topic or prompt for the podcast.");
+    if (!accessToken) {
+      return
+    }
+    if (!userInput.trim() && !file) {
+      setError("Please enter a topic or upload a file.");
       return;
     }
-
+    setError(null);
     setIsLoading(true);
 
     try {
@@ -44,15 +54,19 @@ export default function PodcastPage() {
         URL.revokeObjectURL(audioUrl);
         setAudioUrl(null);
       }
+      const formData = new FormData()
+      if(file){
+        formData.append("file", file)
+      }
+      else if(userInput){
+        formData.append("user_input", userInput)
+      }
 
       const response = await fetchWithAuth(
         `${API_BASE_URL}/generate-podcast`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ user_input: userInput }),
+          body: formData,
         },
         accessToken,
         setAccessToken
@@ -76,14 +90,9 @@ export default function PodcastPage() {
         }
       }
 
-      const audioBytes = new Uint8Array(totalLength);
-      let offset = 0;
-      for (const chunk of chunks) {
-        audioBytes.set(chunk, offset);
-        offset += chunk.length;
-      }
+    
 
-      const blob = new Blob([audioBytes], { type: "audio/wav" });
+      const blob = new Blob(chunks as unknown as BlobPart[], { type: "audio/wav" });
       const url = URL.createObjectURL(blob);
       setAudioUrl(url);
     } catch (err: any) {
@@ -128,6 +137,15 @@ export default function PodcastPage() {
                 className="resize-none text-sm"
               />
             </div>
+            <p className="text-secondary-foreground w-full text-center">or</p>
+            <div>
+              <Label className="mb-2">File Uploader</Label>
+              <Input
+                type="file"
+                className="w-full flex items-center h-auto p-3 bg-card border border-border rounded-xl text-foreground file:cursor-pointer file:rounded-xl file:border-0 file:bg-gray-800 file:text-white file:py-2 file:px-4 file:text-sm file:transition-all hover:file:bg-gray-700"
+                onChange={handleFileChange}
+              />
+            </div>
 
             {error && (
               <p className="text-sm text-red-500">
@@ -137,7 +155,7 @@ export default function PodcastPage() {
 
             <div className="flex justify-between">
               <BackButton />
-              <Button onClick={handleGenerate} disabled={isLoading}>
+              <Button onClick={handleGenerate} disabled={isLoading} className="cursor-pointer">
                 {isLoading && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}

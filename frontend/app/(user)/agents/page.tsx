@@ -43,7 +43,7 @@ const allAgents: Agent[] = [
     bgColor: "bg-emerald-500/10",
     status: "live",
     capabilities: ["Context Awareness", "Parallel Generation", "Auto-Formatting"],
-    href: "/agents/grant"
+    href: "/landing-pages/grant-agent"
   },
   {
     id: "grant-discovery",
@@ -54,7 +54,7 @@ const allAgents: Agent[] = [
     bgColor: "bg-blue-500/10",
     status: "live",
     capabilities: ["Semantic Matching", "Eligibility Check", "Deadline Alerts"],
-    href: "/agents/search"
+    href: "/landing-pages/search-grant-agent"
   },
   {
     id: "podcast-gen",
@@ -65,7 +65,7 @@ const allAgents: Agent[] = [
     bgColor: "bg-violet-500/10",
     status: "beta",
     capabilities: ["Multi-Speaker", "Script Generation", "Audio Export"],
-    href: "/agents/podcast"
+    href: "/landing-pages/podcast-agent"
   },
   {
     id: "resume-ats",
@@ -76,7 +76,7 @@ const allAgents: Agent[] = [
     bgColor: "bg-orange-500/10",
     status: "live",
     capabilities: ["Keyword Injection", "Score Analysis", "PDF Parsing"],
-    href: "/agents/resume"
+    href: "/landing-pages/resume-agent"
   },
   {
     id: "legal-review",

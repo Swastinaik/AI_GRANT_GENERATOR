@@ -17,11 +17,6 @@ export const benefits = [
     icon: <Target className="w-6 h-6" />,
   },
   {
-    title: "Transparent Matching Metrics",
-    description: "See exactly why a grant is recommended. Our dashboard breaks down match factors like keywords, past achievements relevance, funding range, and application difficulty.",
-    icon: <Gauge className="w-6 h-6" />,
-  },
-  {
     title: "Direct Grant-to-Proposal Flow",
     description: "Once you pick a grant, seamlessly move into our proposal generator with auto-filled context. No duplicate writing — generate your tailored grant in minutes.",
     icon: <FileSpreadsheet className="w-6 h-6" />,
