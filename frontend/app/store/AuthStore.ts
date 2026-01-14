@@ -8,12 +8,15 @@ interface AuthState{
     setAccessToken: (token: string | null) => void;
     templateStyle: string| null;
     selectTemplate:(style:string|null)=> void;
+    fundersDetail?: string;
+    setFundersDetail: (detail: string) => void
 }
 
 
 const useAuthStore = create<AuthState>()(
     persist(
         (set, get) =>({
+            templateStyle: null,
             setAccessToken: (token) => {
                 if (token) {
                     set({ accessToken: token });
@@ -21,9 +24,11 @@ const useAuthStore = create<AuthState>()(
                     set({ accessToken: undefined });
                 }
             },
-            templateStyle: null,
             selectTemplate:(template)=>{
                 set({templateStyle: template})
+            },
+            setFundersDetail: (detail) => {
+                set({fundersDetail: detail})
             }
         }),
         {
@@ -32,6 +37,7 @@ const useAuthStore = create<AuthState>()(
             partialize: (state)=>({
                 templateStyle: state.templateStyle,
                 accessToken: state.accessToken,
+                fundersDetail: state.fundersDetail
             })
         }
     )
