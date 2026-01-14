@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,7 +19,6 @@ import {
 import ErrorFallBack from '@/app/components/ErrorBoundary';
 import AuthStore from '@/app/store/AuthStore';
 import useAuthStore from '@/app/store/AuthStore';
-import NewEditor from '../generate-grant/components/NewEditor';
 import LoaderComponent from '@/app/components/Loader';
 import { fetchWithAuth } from '@/app/lib/api';
 const templates = [
@@ -35,6 +34,7 @@ export default function MultiStepTemplateForm() {
   const { selectTemplate } = AuthStore.getState()
   const accessToken = useAuthStore((state) => state.accessToken);
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const fundersDetail = useAuthStore((state)=> state.fundersDetail)
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [confirmedTemplate, setConfirmedTemplate] = useState<string>('modern');
@@ -55,6 +55,13 @@ export default function MultiStepTemplateForm() {
     evaluation_method: '',
     sustainibility_plan: '',
   });
+
+  useEffect(()=>{
+    if(fundersDetail){
+      setFormData((prev)=> ({...prev, funders_detail: fundersDetail}))
+    }
+  }, [fundersDetail])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
