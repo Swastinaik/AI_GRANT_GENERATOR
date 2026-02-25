@@ -19,17 +19,17 @@ export const metadata: Metadata = {
 
   title: "Docs4All",
   description:
-    "An Unified Platform for AI Agents to get things done",
+    "A complete toolkit for searching, drafting, and reviewing grants for non-profit organizations powered by AI.",
 
   openGraph: {
     title: "Docs4All",
     description:
-      "An Unified Platform for AI Agents to get things done",
-    url: new URL("https://ai-grant-generator.vercel.app"),
+      "A complete toolkit for searching, drafting, and reviewing grants for non-profit organizations powered by AI.",
+    url: new URL("https://www.docs4all.online"),
     siteName: "Docs4All",
     images: [
       {
-        url: "https://ai-grant-generator.vercel.app/docs4all.png",
+        url: "https://www.docs4all.online/docs4all.png",
         width: 1894,
         height: 990,
         alt: "Docs4All",
@@ -39,11 +39,11 @@ export const metadata: Metadata = {
   },
 
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Docs4All",
     description:
-      "An Unified Platform for AI Agents to get things done",
-    images: ["https://ai-grant-generator.vercel.app/docs4all.png"],
+      "A complete toolkit for searching, drafting, and reviewing grants for non-profit organizations powered by AI.",
+    images: ["https://www.docs4all.online/docs4all.png"],
   },
 
 };
