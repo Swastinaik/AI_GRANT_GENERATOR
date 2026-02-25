@@ -63,13 +63,13 @@ export const testimonials = [
 
 
 export const navLinks = [
-  
+
   {
     name: "Documentation",
     link: "/docs/agents/grant-writer",
   },
-  
-  
+
+
 ];
 
 
@@ -98,25 +98,25 @@ export const services = [
 
 
 export const AgentsNavigation = [
-    {
-        title: "Grant Agent",
-        description: "Generate tailored grant proposals based on your organization's data.",
-        href: "/landing-pages/grant-agent",
-    },
-    {
-        title: "Grant Search Agent",
-        description: "Search for grants matching your organization's profile.",
-        href: "/landing-pages/search-grant-agent",
-    },
-    {
-        title: "Podcast Agent",
-        description: "Create engaging podcast scripts with AI assistance.",
-        href: "/landing-pages/podcast-agent",
-    },
-    {
-        title: "Resume Agent",
-        description: "Craft professional resumes tailored to your career goals.",
-        href: "/landing-pages/resume-agent",
-    }
+  {
+    title: "Grant Agent",
+    description: "Generate tailored grant proposals based on your organization's data.",
+    href: "/landing-pages/grant-agent",
+  },
+  {
+    title: "Grant Search Agent",
+    description: "Search for grants matching your organization's profile.",
+    href: "/landing-pages/search-grant-agent",
+  },
+  {
+    title: "Podcast Agent",
+    description: "Create engaging podcast scripts with AI assistance.",
+    href: "/landing-pages/podcast-agent",
+  },
+  {
+    title: "Reviewer Agent",
+    description: "Review grant proposals and provide feedback.",
+    href: "/landing-pages/grant-reviewer",
+  }
 ]
 

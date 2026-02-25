@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  FileText, 
-  Mic, 
-  Search, 
-  ScanLine, 
-  ArrowRight, 
+import {
+  FileText,
+  Mic,
+  Search,
+  ScanLine,
+  ArrowRight,
   Sparkles,
   Filter,
   ArrowUpRight,
@@ -68,15 +68,15 @@ const allAgents: Agent[] = [
     href: "/landing-pages/podcast-agent"
   },
   {
-    id: "resume-ats",
-    title: "Resume Optimizer",
-    description: "Tailor your resume for specific job descriptions to maximize ATS scores and interview chances.",
+    id: "grant-reviewer",
+    title: "Grant Reviewer",
+    description: "Review grant proposals for getting the best possible suggestions to get the grant funding.",
     icon: ScanLine,
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
     status: "live",
-    capabilities: ["Keyword Injection", "Score Analysis", "PDF Parsing"],
-    href: "/landing-pages/resume-agent"
+    capabilities: ["Suggestions", "Score Analysis", "PDF Parsing"],
+    href: "/landing-pages/grant-reviewer-agent"
   },
   {
     id: "legal-review",
@@ -135,14 +135,14 @@ export default function AgentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter agents based on search
-  const filteredAgents = allAgents.filter(agent => 
-    agent.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredAgents = allAgents.filter(agent =>
+    agent.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     agent.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      
+
       {/* 1. Header Section */}
       <section className="pt-32 pb-12 border-b border-border/40 bg-secondary/20">
         <div className="container mx-auto px-4 md:px-6">
@@ -155,7 +155,7 @@ export default function AgentsPage() {
               <Zap className="w-3.5 h-3.5 mr-2 fill-yellow-500 text-yellow-500" />
               Docs4All Ecosystem
             </motion.div>
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -163,7 +163,7 @@ export default function AgentsPage() {
             >
               Intelligent Agents
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -178,14 +178,14 @@ export default function AgentsPage() {
       {/* 2. Controls & Grid */}
       <section className="py-12">
         <div className="container mx-auto px-4 md:px-6">
-          
+
           {/* Search Bar */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-10">
             <div className="relative w-full md:w-96">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <input 
-                type="text" 
-                placeholder="Search agents..." 
+              <input
+                type="text"
+                placeholder="Search agents..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
@@ -222,7 +222,7 @@ export default function AgentsPage() {
                   <p className="text-muted-foreground text-sm leading-relaxed mb-6">
                     {agent.description}
                   </p>
-                  
+
                   {/* Capabilities List */}
                   <div className="space-y-2 mb-6">
                     {agent.capabilities.map((cap, i) => (
@@ -236,17 +236,17 @@ export default function AgentsPage() {
 
                 {/* Card Footer / Action */}
                 <div className="p-6 pt-0 mt-auto">
-                   {agent.status !== 'coming_soon' ? (
-                     <Link href={agent.href} className="flex items-center justify-center w-full py-3 rounded-xl bg-secondary text-secondary-foreground font-medium hover:bg-primary hover:text-primary-foreground transition-all group/btn">
-                        Launch Agent 
-                        <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
-                     </Link>
-                   ) : (
-                     <button disabled className="flex items-center justify-center w-full py-3 rounded-xl border border-border bg-background text-muted-foreground cursor-not-allowed">
-                        <Lock className="mr-2 w-4 h-4" />
-                        Notify Me
-                     </button>
-                   )}
+                  {agent.status !== 'coming_soon' ? (
+                    <Link href={agent.href} className="flex items-center justify-center w-full py-3 rounded-xl bg-secondary text-secondary-foreground font-medium hover:bg-primary hover:text-primary-foreground transition-all group/btn">
+                      Launch Agent
+                      <ArrowUpRight className="ml-2 w-4 h-4 transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
+                    </Link>
+                  ) : (
+                    <button disabled className="flex items-center justify-center w-full py-3 rounded-xl border border-border bg-background text-muted-foreground cursor-not-allowed">
+                      <Lock className="mr-2 w-4 h-4" />
+                      Notify Me
+                    </button>
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -264,14 +264,14 @@ export default function AgentsPage() {
       {/* 3. Bottom CTA */}
       <section className="py-24 border-t border-border mt-12">
         <div className="container mx-auto px-4 text-center">
-           <h2 className="text-2xl font-bold mb-4">Don't see what you need?</h2>
-           <p className="text-muted-foreground mb-8">
-             We are constantly adding new agents to the Docs4All ecosystem. <br />
-             Request a custom agent for your workflow.
-           </p>
-           <button className="h-10 px-6 rounded-full border border-input bg-background hover:bg-secondary transition-colors font-medium">
-             Request Feature
-           </button>
+          <h2 className="text-2xl font-bold mb-4">Don't see what you need?</h2>
+          <p className="text-muted-foreground mb-8">
+            We are constantly adding new agents to the Docs4All ecosystem. <br />
+            Request a custom agent for your workflow.
+          </p>
+          <button className="h-10 px-6 rounded-full border border-input bg-background hover:bg-secondary transition-colors font-medium">
+            Request Feature
+          </button>
         </div>
       </section>
 

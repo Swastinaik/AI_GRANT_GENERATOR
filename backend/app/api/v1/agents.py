@@ -20,6 +20,7 @@ from app.ai_agents.resume_agent import ResumeAgent
 from app.services.podcast_agent.nodes import generate_podcast_script, stream_generator_wrapper, generate_script_from_pdf
 from app.schemas.agents import SearchGrantInput, PodcastRequest
 from app.core.deps import check_usage, update_usage
+from app.services.grant_reviewer.utils import generate_grant_text, generate_grant_review
 from app.services.history.history import create_user_history, get_user_history
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -166,8 +167,8 @@ async def generate_podcast_script_endpoint(
             file_temp_path = os.path.join(UPLOAD_DIRECTORY, unique_filename)
             with open(file_temp_path, "wb+") as buffer:
                 await run_in_threadpool(shutil.copyfileobj, file.file, buffer)
-            background_tasks.add_task(delete_file, file_temp_path)
             podcast_script = await generate_script_from_pdf(file_temp_path)
+            background_tasks.add_task(delete_file, file_temp_path)
         else:
             podcast_script = await generate_podcast_script(user_input)
         
@@ -193,3 +194,40 @@ async def generate_podcast_script_endpoint(
         raise HTTPException(
             status_code=500, 
             detail="An error occurred while generating the podcast script.")
+
+
+@router.post("/grant-reviewer")
+async def review_grant(
+    background_tasks: BackgroundTasks,
+    grant_file: UploadFile = File(...),
+    grant_description: str =  Form(...),
+    usage: dict = Depends(check_usage)
+):
+    if usage["count"] >= 5:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="Usage limit exceeded (5 per day)")
+    
+    try:
+        file_temp_path = None
+        file_ext = os.path.splitext(grant_file.filename)[1]
+        unique_filename = f"{uuid.uuid4()}{file_ext}"
+        file_temp_path = os.path.join(UPLOAD_DIRECTORY, unique_filename)
+        with open(file_temp_path, "wb+") as buffer:
+            await run_in_threadpool(shutil.copyfileobj, grant_file.file, buffer)  
+        grant_text = generate_grant_text(file_temp_path)
+        review = await generate_grant_review(grant_text, grant_description)
+        background_tasks.add_task(delete_file, file_temp_path)
+        await update_usage(usage)
+        await create_user_history(user_email=usage["email"], agent_name="Grant Reviewer", description=grant_description)
+        return review
+    except Exception as e:
+        print("Error generating grant review:", e)
+        traceback.print_exc()
+        if file_temp_path:
+            delete_file(file_temp_path)
+        raise HTTPException(
+            status_code=500, 
+            detail="An error occurred while generating the grant review.")
+        
+       

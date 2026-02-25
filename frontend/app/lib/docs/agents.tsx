@@ -2,6 +2,7 @@ import { GrantAgent } from "./GrantGeneration";
 import { SearchGrant } from "./SeachGrant";
 import { ResumeAgent } from "./ResumeAgent";
 import { PodcastAgent } from "./PodcastAgent";
+import { GrantReviewerAgent } from "./GrantReviewer";
 export type DocsSection = {
   id: string;
   title: string;
@@ -21,5 +22,6 @@ export const agentsDocs: AgentDocs[] = [
   GrantAgent,
   SearchGrant,
   ResumeAgent,
-  PodcastAgent
+  PodcastAgent,
+  GrantReviewerAgent,
 ];

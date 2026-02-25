@@ -13,6 +13,9 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
+  verification: {
+    google: "-iWU8KsllBQE1FylqyfNzkxlzvATAmDnYEurNUGArOc",
+  },
 
   title: "Docs4All",
   description:
@@ -22,7 +25,7 @@ export const metadata: Metadata = {
     title: "Docs4All",
     description:
       "An Unified Platform for AI Agents to get things done",
-    url:  new URL("https://ai-grant-generator.vercel.app"),
+    url: new URL("https://ai-grant-generator.vercel.app"),
     siteName: "Docs4All",
     images: [
       {
@@ -49,7 +52,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
- 
+
 
 
 
@@ -57,12 +60,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
 
-         className={`${roboto.variable} font-sans`}
+        className={`${roboto.variable} font-sans`}
       >
         <ClientLayout>
           {children}
         </ClientLayout>
-    
+
       </body>
     </html>
   );

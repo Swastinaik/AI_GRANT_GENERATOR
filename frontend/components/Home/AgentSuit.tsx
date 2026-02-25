@@ -2,13 +2,13 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  FileText, 
-  Mic, 
-  Search, 
-  ScanLine, 
-  ArrowRight, 
-  Check, 
+import {
+  FileText,
+  Mic,
+  Search,
+  ScanLine,
+  ArrowRight,
+  Check,
   Database,
   Share2,
   Lock
@@ -26,9 +26,9 @@ const agents = [
     cols: "md:col-span-2"
   },
   {
-    id: "resume-ats",
-    title: "Resume Optimizer",
-    desc: "Beat ATS algorithms by tailoring your resume to specific job descriptions.",
+    id: "grant-reviewer",
+    title: "Grant Reviewer",
+    desc: "Review grant proposals and provide feedback.",
     icon: ScanLine,
     color: "text-orange-500",
     bg: "bg-orange-500/10",
@@ -86,10 +86,10 @@ const AgentSuite = () => {
                   <ArrowRight size={16} className="-rotate-45 group-hover:rotate-0 transition-transform duration-300" />
                 </div>
               </div>
-              
+
               <h3 className="text-2xl font-bold mb-2">{agent.title}</h3>
               <p className="text-muted-foreground mb-4">{agent.desc}</p>
-              
+
               {/* Decorative gradient overlay */}
               <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500" />
             </motion.div>

@@ -181,7 +181,7 @@ const DocsAllHero = () => {
 
           {/* 3. Resume Agent (Bottom Left) */}
           <AgentCard
-            title="Resume ATS"
+            title="Grant Reviewer"
             icon={ScanLine}
             color="bg-orange-500"
             position="bottom-[15%] left-[5%] md:left-[10%]"
