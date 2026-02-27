@@ -33,20 +33,20 @@ const Hero = () => {
             transition={{ duration: 0.6 }}
             className="flex flex-col gap-6"
           >
-            <div className="inline-flex items-center rounded-full border border-border px-3 py-1 text-sm font-medium text-muted-foreground w-fit bg-secondary/50 backdrop-blur">
+            <div className="mx-auto md:mx-0 flex items-center rounded-full border border-border px-3 py-1 text-sm font-medium text-muted-foreground w-fit bg-secondary/50 backdrop-blur">
               <Sparkles className="w-3.5 h-3.5 mr-2 text-primary" />
               AI Grant Intelligence Platform
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05]">
-              <span className="text-foreground">Docs4All</span>
+            <h1 className="text-center md:text-left text-4xl md:text-6xl font-bold tracking-tight leading-[1.05]">
+              <span className="text-foreground ">Docs4All</span>
               <br />
               <span className="bg-gradient-to-r from-primary via-purple-500 to-violet-500 bg-clip-text text-transparent">
-                Turn Context Into Winning Grants
+                Turn Ideas Into Winning Grants
               </span>
             </h1>
 
-            <p className="text-lg text-muted-foreground max-w-[520px]">
+            <p className="text-center md:text-left text-lg text-muted-foreground max-w-[520px]">
               Generate, discover, and review grant applications using
               AI agents that understand your organization’s mission and goals —
               cutting preparation time while increasing funding probability.
@@ -65,7 +65,7 @@ const Hero = () => {
                 href="/search-grant"
                 className="h-12 px-8 rounded-lg border border-input bg-background hover:bg-accent hover:text-accent-foreground font-medium text-lg transition-colors flex items-center justify-center"
               >
-                Explore Discovery
+                Search best Grants
               </Link>
             </div>
           </motion.div>
