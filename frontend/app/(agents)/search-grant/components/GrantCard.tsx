@@ -1,65 +1,111 @@
 'use client';
 
-import Link from 'next/link';
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { useRouter } from 'next/navigation'
-import {GrantType} from '../../../lib/utils/types'
-import  useAuthStore  from "@/app/store/AuthStore"
+} from "@/components/ui/card";
+import { useRouter } from 'next/navigation';
+import { GrantType } from '../../../lib/utils/types';
+import useAuthStore from "@/app/store/AuthStore";
+import { Building2, Calendar, ExternalLink, Sparkles, Activity } from "lucide-react";
+
 interface GrantCardProps {
-    grant: GrantType;
+  grant: GrantType;
 }
-export default function GrantCard( grant :GrantCardProps) {
-  const setFundersDetail = useAuthStore((state)=> state.setFundersDetail)
-  const {id,title,agency,agencyCode,openDate,closeDate,link,score} = grant.grant
-  const fundersDetail = `The id of Organization is ${id} title ${title}, agency name is ${agency} with code ${agencyCode}, the opening date for the grant is ${openDate} and closing date is ${closeDate}`
-  const router = useRouter()
+
+export default function GrantCard({ grant }: GrantCardProps) {
+  const setFundersDetail = useAuthStore((state) => state.setFundersDetail);
+  const { id, title, agency, agencyCode, openDate, closeDate, link, score } = grant;
+
+  const fundersDetail = `The id of Organization is ${id} title ${title}, agency name is ${agency} with code ${agencyCode}, the opening date for the grant is ${openDate} and closing date is ${closeDate}`;
+  const router = useRouter();
+
   const handleGenerate = () => {
-  try {
-    setFundersDetail(fundersDetail)
-    router.push(`/generate-grant`)
-  } catch (error) {
-    console.log(error)
-  }
+    try {
+      setFundersDetail(fundersDetail);
+      router.push(`/generate-grant`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Visual helper for score
+  const getScoreVariant = (scoreValue: number) => {
+    if (scoreValue >= 80) return "default"; // Usually primary color
+    if (scoreValue >= 50) return "secondary";
+    return "destructive";
   };
 
   return (
-    <Card className="flex flex-col justify-between h-full p-6 bg-secondary text-secondary-foreground">
-      <CardHeader>
-        <CardTitle className='text-2xl  font-bold'>{title}</CardTitle>
+    <Card className="flex flex-col h-full bg-card border-border shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-300 group overflow-hidden">
+
+      <CardHeader className="pb-4 border-b border-border/50 bg-muted/10">
+        <div className="flex justify-between items-start gap-4 mb-2">
+          <Badge variant="outline" className="bg-background font-medium text-xs">
+            {agencyCode}
+          </Badge>
+          <Badge variant={getScoreVariant(Number(score))} className="flex items-center gap-1 shadow-none">
+            <Activity className="w-3 h-3" />
+            Match: {score}%
+          </Badge>
+        </div>
+        <CardTitle className="text-xl font-bold leading-tight text-foreground group-hover:text-primary transition-colors line-clamp-2">
+          {title}
+        </CardTitle>
       </CardHeader>
-      <CardContent   className="space-y-2 text-foreground">
-        <p><span className="font-semibold text-foreground">Agency:</span> {agency}</p>
-        <p><span className="font-semibold text-foreground">Agency Code:</span> {agencyCode}</p>
-        <p><span className="font-semibold text-foreground">Open Date:</span> {openDate}</p>
-        <p><span className="font-semibold text-foreground">Close Date:</span> {closeDate}</p>
-        <p><span className="font-semibold text-foreground">Score:</span> {score} (for your granrt)</p>
-        
+
+      <CardContent className="flex-1 space-y-4 pt-5 text-sm">
+        <div className="flex items-start gap-3">
+          <Building2 className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+          <div>
+            <p className="font-medium text-foreground leading-none mb-1">Agency</p>
+            <p className="text-muted-foreground">{agency}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 pt-2">
+          <div className="flex items-start gap-2">
+            <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium text-foreground leading-none mb-1">Opens</p>
+              <p className="text-muted-foreground">{openDate || 'N/A'}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2">
+            <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium text-foreground leading-none mb-1">Closes</p>
+              <p className="text-muted-foreground">{closeDate || 'N/A'}</p>
+            </div>
+          </div>
+        </div>
       </CardContent>
-      {/* Buttons at the bottom-right corner */}
-      <CardFooter className="flex justify-around items-center mt-6">
-        <a href={link} target="_blank" rel="noopener noreferrer" className=" underline">
+
+      <CardFooter className="pt-4 pb-6 px-6 border-t border-border/50 gap-3 flex flex-col sm:flex-row bg-background/50">
         <Button
-        variant={'outline'}
+          variant="outline"
+          className="w-full sm:flex-1 bg-background hover:bg-muted"
+          asChild
         >
-          View Grant
-          Apply
+          <a href={link} target="_blank" rel="noopener noreferrer">
+            View Details
+            <ExternalLink className="w-4 h-4 ml-2 opacity-70" />
+          </a>
         </Button>
-        </a>
         <Button
           onClick={handleGenerate}
+          className="w-full sm:flex-1 shadow-sm"
         >
-          Generate
+          <Sparkles className="w-4 h-4 mr-2" />
+          Draft Grant
         </Button>
       </CardFooter>
+
     </Card>
   );
 }
