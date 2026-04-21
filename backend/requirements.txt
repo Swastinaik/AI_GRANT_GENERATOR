@@ -13,4 +13,7 @@ uvicorn
 PyJWT
 passlib[bcrypt]
 python-dotenv
-argon2-cffi\npython-docx
+argon2-cffi
+python-docx
+langgraph
+langchain-text-splitters

@@ -29,9 +29,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Explicit origins required when allow_credentials=True
+    allow_origins=[FRONTEND_URL],  # Explicit origins required when allow_credentials=True
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
