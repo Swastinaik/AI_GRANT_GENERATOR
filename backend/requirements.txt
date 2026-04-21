@@ -17,3 +17,4 @@ argon2-cffi
 python-docx
 langgraph
 langchain-text-splitters
+python-multipart
