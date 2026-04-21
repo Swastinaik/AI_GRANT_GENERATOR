@@ -45,5 +45,4 @@ app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
 app.include_router(project_router, prefix="/api", tags=["Projects"])
 app.include_router(proposal_router, prefix="/api", tags=["Proposals"])
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
