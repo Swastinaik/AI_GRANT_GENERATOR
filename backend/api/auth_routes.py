@@ -54,16 +54,17 @@ async def login(response: Response, form_data: OAuth2PasswordRequestForm = Depen
         )
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
+    token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
 
     # Set token as an httpOnly cookie — not accessible by JS
     response.set_cookie(
         key="token",
-        value=access_token,
+        value=token,
         httponly=True,
-        samesite="lax",
+        samesite="none",
+        secure=True,
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         path="/",
     )
