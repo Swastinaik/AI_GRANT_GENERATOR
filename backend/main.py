@@ -29,11 +29,12 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-FRONTEND_URL = os.getenv("FRONTEND_URL")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
+origins = [origin.strip() for origin in FRONTEND_URL.split(",")] if FRONTEND_URL else []
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL],  # Explicit origins required when allow_credentials=True
+    allow_origins=origins,  # Correctly passed as a list of strings
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

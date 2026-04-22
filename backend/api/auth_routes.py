@@ -77,8 +77,7 @@ async def logout(response: Response, current_user: User = Depends(get_current_us
     response.delete_cookie(key="token", path="/")
     return {"message": "Successfully logged out."}
 
-@router.get("/me")
+@router.get("/me", response_model=User)
 async def me(current_user: User = Depends(get_current_user)):
-    del current_user.password
     return current_user
     

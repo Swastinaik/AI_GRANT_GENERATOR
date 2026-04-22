@@ -6,7 +6,7 @@ class User(Document):
     id: Optional[PydanticObjectId] = Field(default_factory=None, alias="_id")
     fullname: str
     email: str
-    password: str
+    password: str = Field(exclude=True)
     org_id: Optional[PydanticObjectId] = None
 
     class Settings:
