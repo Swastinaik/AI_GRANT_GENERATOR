@@ -29,8 +29,14 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "")
-origins = [origin.strip() for origin in FRONTEND_URL.split(",")] if FRONTEND_URL else []
+FRONTEND_URL_RAW = os.getenv("FRONTEND_URL", "")
+# Split by comma, strip spaces, and remove any accidental quotes or empty strings
+origins = [
+    origin.strip().strip('"').strip("'") 
+    for origin in FRONTEND_URL_RAW.split(",") 
+    if origin.strip()
+]
+
 
 app.add_middleware(
     CORSMiddleware,
