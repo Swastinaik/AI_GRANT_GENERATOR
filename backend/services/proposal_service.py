@@ -65,9 +65,11 @@ async def update_proposal_service(proposal_id: PydanticObjectId, proposal: Propo
     except Exception as e:
         raise Exception(f"Failed to update proposal: {str(e)}")
 
-async def delete_proposal_service(proposal_id: PydanticObjectId):
+async def delete_proposal_service(proposal_id: str):
     try:
-        await Proposal.get(proposal_id).delete()
+        proposal = await Proposal.get(proposal_id)
+        if proposal:
+            await proposal.delete()
         return True
     except Exception as e:
         raise Exception(f"Failed to delete proposal: {str(e)}")

@@ -1,6 +1,6 @@
 from pymongo import AsyncMongoClient
 from beanie import init_beanie
-from models import User, Organization, Project, Proposal
+from models import User, Organization, Project, Proposal, Grant
 
 async def init_db(connection_string: str, database_name: str):
     """
@@ -14,6 +14,7 @@ async def init_db(connection_string: str, database_name: str):
             User,
             Organization,
             Project,
-            Proposal
+            Proposal,
+            Grant
         ]
     )
